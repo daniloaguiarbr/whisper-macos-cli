@@ -1,0 +1,51 @@
+[package]
+name = "whisper-macos-cli"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+authors = ["Danilo Teixeira"]
+description = "macOS-exclusive CLI for local audio transcription via whisper.cpp with Metal GPU acceleration. Stdin/stdout JSON contract for AI agents."
+license = "MIT"
+homepage = "https://github.com/daniloteixeira/whisper-macos-cli"
+repository = "https://github.com/daniloteixeira/whisper-macos-cli"
+keywords = ["whisper", "transcription", "macos", "audio", "speech-to-text"]
+categories = ["command-line-utilities", "multimedia::audio"]
+include = [
+    "src/**/*.rs",
+    "build.rs",
+    "Cargo.toml",
+    "Cargo.lock",
+    "README.md",
+    "LICENSE",
+    "AGENTS.md",
+    "SKILL.md",
+    "llms.txt",
+    "NOTICE",
+]
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+anyhow = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+sys-locale = "0.3"
+is-terminal = "0.4"
+directories = "6"
+libc = "0.2"
+ctrlc = "3"
+symphonia = { version = "0.5", features = ["mp3", "ogg", "vorbis", "flac", "wav", "aac", "isomp4"] }
+rubato = "0.16"
+earshot = "1"
+regex = "1"
+whisper-rs = { version = "0.16", features = ["metal", "tracing_backend"] }
+reqwest = { version = "0.12", features = ["blocking", "rustls-tls"], default-features = false }
+indicatif = "0.17"
+ogg = "0.9"
+opus-decoder = "0.1"
+
+[[bin]]
+name = "whisper-macos-cli"
+path = "src/main.rs"

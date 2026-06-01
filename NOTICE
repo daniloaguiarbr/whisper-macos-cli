@@ -1,0 +1,25 @@
+whisper-macos-cli
+Copyright 2024-2026 Danilo Teixeira
+Licensed under MIT
+
+This software includes the following third-party components:
+
+Symphonia — Pure Rust audio decoding
+  License: MPL-2.0
+  Source: https://github.com/pdeljanov/Symphonia
+
+whisper.cpp — C/C++ port of OpenAI's Whisper model
+  License: MIT
+  Source: https://github.com/ggerganov/whisper.cpp
+
+whisper-rs — Rust bindings for whisper.cpp
+  License: Unlicense
+  Source: https://github.com/tazz4843/whisper-rs
+
+earshot — Voice Activity Detection via Silero ONNX
+  License: MIT
+  Source: https://github.com/pykeio/earshot
+
+Rubato — Async/sync resampling
+  License: MIT
+  Source: https://github.com/HEnquist/rubato

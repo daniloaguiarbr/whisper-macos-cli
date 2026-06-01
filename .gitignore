@@ -1,0 +1,14 @@
+# Arquivos do ambiente de desenvolvimento local
+CLAUDE.md
+graphrag.sqlite
+graphrag.sqlite-wal
+graphrag.sqlite-shm
+docs_rules_cli/
+
+# Build artifacts
+target/
+
+# OS
+.DS_Store
+*.swp
+*.swo
