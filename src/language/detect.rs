@@ -112,7 +112,17 @@ fn map_to_whisper_code(code: &str) -> &'static str {
 pub fn resolve_language(cli_lang: Option<&str>) -> (&'static str, &'static str) {
     match cli_lang {
         Some("auto") => ("auto", "whisper_auto"),
-        Some(lang) => (map_to_whisper_code(lang), "cli"),
+        Some(lang) => {
+            let resolved = map_to_whisper_code(lang);
+            if resolved == "en" && lang != "en" {
+                tracing::warn!(
+                    requested = lang,
+                    resolved = "en",
+                    "unknown language code, falling back to English"
+                );
+            }
+            (resolved, "cli")
+        }
         None => (detect_language(), "os_locale"),
     }
 }

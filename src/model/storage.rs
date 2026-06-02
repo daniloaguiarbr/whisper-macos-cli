@@ -24,7 +24,7 @@ pub fn model_path(model: &ModelInfo) -> Result<PathBuf, Error> {
 pub fn is_model_downloaded(model: &ModelInfo) -> Result<bool, Error> {
     let path = model_path(model)?;
     match std::fs::metadata(&path) {
-        Ok(meta) => Ok(meta.len() >= model.size_bytes * 9 / 10),
+        Ok(meta) => Ok(meta.len() >= model.min_size_bytes),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(false),
         Err(e) => Err(Error::Io(e)),
     }
@@ -37,4 +37,8 @@ pub fn remove_model(model: &ModelInfo) -> Result<(), Error> {
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
         Err(e) => Err(Error::Io(e)),
     }
+}
+
+pub fn model_temp_path(model: &ModelInfo) -> Result<PathBuf, Error> {
+    Ok(model_path(model)?.with_extension("bin.tmp"))
 }

@@ -1,0 +1,54 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Release
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Build release binaries
+        run: |
+          cargo build --release --target aarch64-apple-darwin
+          cargo build --release --target x86_64-apple-darwin
+      - name: Generate SHA256SUMS
+        run: |
+          cd target
+          {
+            sha256sum aarch64-apple-darwin/release/whisper-macos-cli
+            sha256sum x86_64-apple-darwin/release/whisper-macos-cli
+          } > SHA256SUMS
+      - name: Generate SBOM
+        uses: cyclonedx/cyclonedx-rust-action@v1
+        with:
+          format: json
+          output-file: sbom.cdx.json
+      - name: Publish to crates.io
+        run: cargo publish --target aarch64-apple-darwin
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            target/aarch64-apple-darwin/release/whisper-macos-cli
+            target/x86_64-apple-darwin/release/whisper-macos-cli
+            target/SHA256SUMS
+            sbom.cdx.json
+          generate_release_notes: true
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: whisper-macos-cli
+          subject-digest: ${{ steps.hash.outputs.digest }}

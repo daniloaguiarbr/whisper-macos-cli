@@ -1,0 +1,7 @@
+[advisories]
+ignore = []
+informational_warnings = ["unmaintained", "notice"]
+severity_threshold = "low"
+
+[yanked]
+ignore = []

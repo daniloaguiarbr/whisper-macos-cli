@@ -2,50 +2,109 @@
 name = "whisper-macos-cli"
 version = "0.1.0"
 edition = "2024"
-rust-version = "1.85"
-authors = ["Danilo Teixeira"]
-description = "macOS-exclusive CLI for local audio transcription via whisper.cpp with Metal GPU acceleration. Stdin/stdout JSON contract for AI agents."
+rust-version = "1.88"
+authors = ["Danilo Teixeira <danilo@example.com>"]
+description = "Transcribe audio files locally on Apple Silicon via whisper.cpp with Metal GPU acceleration, exposing a strict stdin/stdout JSON contract for AI agents and Unix pipelines."
 license = "MIT"
-homepage = "https://github.com/daniloteixeira/whisper-macos-cli"
-repository = "https://github.com/daniloteixeira/whisper-macos-cli"
-keywords = ["whisper", "transcription", "macos", "audio", "speech-to-text"]
-categories = ["command-line-utilities", "multimedia::audio"]
+homepage = "https://github.com/daniloaguiarbr/whisper-macos-cli"
+repository = "https://github.com/daniloaguiarbr/whisper-macos-cli"
+keywords = ["whisper", "transcription", "macos", "audio", "ai-agents"]
+categories = ["command-line-utilities", "multimedia::audio", "api-bindings"]
+readme = "README.md"
+documentation = "https://docs.rs/whisper-macos-cli"
 include = [
     "src/**/*.rs",
+    "tests/**/*.rs",
     "build.rs",
     "Cargo.toml",
     "Cargo.lock",
     "README.md",
+    "README.pt-BR.md",
+    "CHANGELOG.md",
+    "CHANGELOG.pt-BR.md",
+    "CONTRIBUTING.md",
+    "CONTRIBUTING.pt-BR.md",
+    "CODE_OF_CONDUCT.md",
+    "CODE_OF_CONDUCT.pt-BR.md",
+    "SECURITY.md",
+    "SECURITY.pt-BR.md",
+    "INTEGRATIONS.md",
+    "INTEGRATIONS.pt-BR.md",
+    "PRIVACY.md",
+    "PRIVACY.pt-BR.md",
     "LICENSE",
+    "NOTICE",
     "AGENTS.md",
+    "AGENTS.pt-BR.md",
     "SKILL.md",
     "llms.txt",
-    "NOTICE",
+    "llms.pt-BR.txt",
+    "llms-full.txt",
+    "deny.toml",
+    ".editorconfig",
+    "docs/**/*",
+    "skill/**/*",
+    "THIRD-PARTY-LICENSES.md",
 ]
 
+[features]
+default = ["metal"]
+metal = []
+mcp = []
+
 [dependencies]
-clap = { version = "4", features = ["derive"] }
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+clap = { version = "4", features = ["derive", "wrap_help", "string", "env"] }
+clap_complete = "4"
+clap_mangen = "0.2"
 thiserror = "2"
 anyhow = "1"
 tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 sys-locale = "0.3"
 is-terminal = "0.4"
 directories = "6"
 libc = "0.2"
 ctrlc = "3"
+signal-hook = "0.3"
 symphonia = { version = "0.5", features = ["mp3", "ogg", "vorbis", "flac", "wav", "aac", "isomp4"] }
 rubato = "0.16"
 earshot = "1"
 regex = "1"
 whisper-rs = { version = "0.16", features = ["metal", "tracing_backend"] }
-reqwest = { version = "0.12", features = ["blocking", "rustls-tls"], default-features = false }
+reqwest = { version = "0.12", features = ["blocking", "rustls-tls", "gzip"], default-features = false }
 indicatif = "0.17"
 ogg = "0.9"
 opus-decoder = "0.1"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+unicode-normalization = "0.1"
+sha2 = "0.10"
+hex = "0.4"
+uuid = { version = "1", features = ["v7", "serde"] }
+human-panic = "2"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = "symbols"
+panic = "abort"
 
 [[bin]]
 name = "whisper-macos-cli"
 path = "src/main.rs"
+
+[build-dependencies]
+clap = { version = "4", features = ["derive"] }
+clap_mangen = "0.2"
+
+[dev-dependencies]
+assert_cmd = "2"
+predicates = "3"
+serde_json = "1"
+insta = { version = "1", features = ["json"] }
+criterion = { version = "0.5", features = ["html_reports"] }
+wiremock = "0.6"
+tempfile = "3"
+serial_test = "3"
+proptest = "1"

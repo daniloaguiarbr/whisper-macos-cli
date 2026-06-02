@@ -1,0 +1,51 @@
+[English version](llms.txt) | [Versão em Português Brasileiro](llms.pt-BR.txt)
+
+# whisper-macos-cli
+
+> macOS-exclusive CLI for local audio transcription via whisper.cpp with Metal GPU acceleration
+
+whisper-macos-cli is a Rust CLI that transcribes audio files to text
+using whisper.cpp with Apple Silicon Metal GPU. It accepts audio via
+file arguments or stdin pipe and emits JSON on stdout. Designed for
+AI agent integration with a strict stdin/stdout JSON contract.
+
+## Key Features
+
+- Metal GPU acceleration on Apple Silicon (M1/M2/M3/M4)
+- Maximum quality defaults: large-v3 model, BeamSearch beam_size=8
+- Supports: MP3, OGG/Vorbis, OGG/Opus (WhatsApp), FLAC, WAV, AAC
+- Auto-detects language from macOS system locale
+- VAD-based chunking prevents hallucinations
+- NDJSON mode for batch processing
+- correlation_id UUID v7 in every output for traceability
+- schema_version in every output for evolution safety
+- HTTPS-only model downloads with User-Agent identification
+- Local-only: zero telemetry, zero phone-home
+
+## Quick Start
+
+```bash
+cargo install whisper-macos-cli
+whisper-macos-cli models download
+whisper-macos-cli transcribe audio.ogg
+```
+
+## Primary Documentation
+
+- [README.md](README.md) — Project overview, install, usage
+- [AGENTS.md](AGENTS.md) — AI agent integration guide
+- [CHANGELOG.md](CHANGELOG.md) — Release history
+- [CONTRIBUTING.md](CONTRIBUTING.md) — How to contribute
+- [SECURITY.md](SECURITY.md) — Vulnerability policy
+- [INTEGRATIONS.md](INTEGRATIONS.md) — Integrations catalog
+- [docs/HOW_TO_USE.md](docs/HOW_TO_USE.md) — Advanced recipes
+- [docs/AGENTS.md](docs/AGENTS.md) — Author guide for agent integrators
+- [docs/COOKBOOK.md](docs/COOKBOOK.md) — 20+ worked examples
+- [docs/CROSS_PLATFORM.md](docs/CROSS_PLATFORM.md) — Platform matrix
+- [docs/MIGRATION.md](docs/MIGRATION.md) — Version migration
+- [docs/TESTING.md](docs/TESTING.md) — Testing guide
+- [docs/schemas/](docs/schemas/README.md) — Machine-readable JSON schemas
+- [skill/](skill/) — Agent skill descriptors
+- [llms-full.txt](llms-full.txt) — Full reference
+
+Expanded content for LLMs is in [llms-full.txt](llms-full.txt).

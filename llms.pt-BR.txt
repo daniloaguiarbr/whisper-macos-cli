@@ -1,0 +1,52 @@
+[English version](llms.txt) | [Versão em Português Brasileiro](llms.pt-BR.txt)
+
+# whisper-macos-cli
+
+> CLI exclusiva para macOS para transcrição local de áudio via whisper.cpp com aceleração Metal GPU
+
+whisper-macos-cli é uma CLI Rust que transcreve arquivos de áudio
+para texto usando whisper.cpp com Metal GPU da Apple Silicon. Aceita
+áudio via argumentos de arquivo ou pipe stdin e emite JSON no
+stdout. Projetada para integração com agentes de IA via contrato
+estrito stdin/stdout JSON.
+
+## Características Principais
+
+- Aceleração Metal GPU em Apple Silicon (M1/M2/M3/M4)
+- Qualidade máxima por padrão: modelo large-v3, BeamSearch beam_size=8
+- Suporta: MP3, OGG/Vorbis, OGG/Opus (WhatsApp), FLAC, WAV, AAC
+- Detecção automática de idioma a partir do locale do macOS
+- Chunking baseado em VAD previne alucinações
+- Modo NDJSON para processamento em lote
+- correlation_id UUID v7 em cada saída para rastreabilidade
+- schema_version em cada saída para evolução segura
+- Downloads de modelo apenas HTTPS com identificação User-Agent
+- Local apenas: zero telemetria, zero chamadas em nuvem
+
+## Início Rápido
+
+```bash
+cargo install whisper-macos-cli
+whisper-macos-cli models download
+whisper-macos-cli transcribe audio.ogg
+```
+
+## Documentação Primária
+
+- [README.md](README.md) — Visão geral do projeto, instalação, uso
+- [AGENTS.md](AGENTS.md) — Guia de integração para agentes de IA
+- [CHANGELOG.md](CHANGELOG.md) — Histórico de versões
+- [CONTRIBUTING.md](CONTRIBUTING.md) — Como contribuir
+- [SECURITY.md](SECURITY.md) — Política de vulnerabilidades
+- [INTEGRATIONS.md](INTEGRATIONS.md) — Catálogo de integrações
+- [docs/HOW_TO_USE.md](docs/HOW_TO_USE.md) — Receitas avançadas
+- [docs/AGENTS.md](docs/AGENTS.md) — Guia para autores de agentes
+- [docs/COOKBOOK.md](docs/COOKBOOK.md) — 20+ exemplos práticos
+- [docs/CROSS_PLATFORM.md](docs/CROSS_PLATFORM.md) — Matriz de plataformas
+- [docs/MIGRATION.md](docs/MIGRATION.md) — Migração de versões
+- [docs/TESTING.md](docs/TESTING.md) — Guia de testes
+- [docs/schemas/](docs/schemas/README.md) — Schemas JSON legíveis por máquina
+- [skill/](skill/) — Descritores de skill para agentes
+- [llms-full.txt](llms-full.txt) — Referência completa
+
+O conteúdo expandido para LLM está em [llms-full.txt](llms-full.txt).

@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/daniloaguiarbr/whisper-macos-cli/schemas/transcribe-result/v0.1.0.json",
+  "title": "TranscriptionResult",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "correlation_id",
+    "file",
+    "language",
+    "language_source",
+    "model",
+    "duration_seconds",
+    "text",
+    "vad_chunks",
+    "processing_time_ms"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "Envelope version, e.g. 0.1.0"
+    },
+    "correlation_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "UUID v7 generated per process invocation"
+    },
+    "file": {
+      "type": "string",
+      "description": "Filename or <stdin> for piped input"
+    },
+    "language": {
+      "type": "string",
+      "description": "Detected or forced language code"
+    },
+    "language_source": {
+      "type": "string",
+      "enum": ["cli", "whisper_auto", "os_locale"]
+    },
+    "model": {
+      "type": "string",
+      "description": "Whisper model name"
+    },
+    "duration_seconds": {
+      "type": "number",
+      "minimum": 0
+    },
+    "text": {
+      "type": "string",
+      "description": "Full transcription text, NFC-normalized"
+    },
+    "segments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["start", "end", "text"],
+        "properties": {
+          "start": {"type": "number"},
+          "end": {"type": "number"},
+          "text": {"type": "string"}
+        }
+      }
+    },
+    "vad_chunks": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "processing_time_ms": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/daniloaguiarbr/whisper-macos-cli/schemas/error/v0.1.0.json",
+  "title": "ErrorEnvelope",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "error",
+    "code",
+    "message",
+    "category",
+    "retryable",
+    "docs_url",
+    "correlation_id"
+  ],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "error": {"type": "boolean", "const": true},
+    "code": {"type": "integer", "minimum": 0, "maximum": 255},
+    "message": {"type": "string"},
+    "category": {
+      "type": "string",
+      "enum": ["usage", "input", "data", "config", "service", "internal", "io"]
+    },
+    "retryable": {"type": "boolean"},
+    "retry_after_ms": {"type": ["integer", "null"]},
+    "hint": {"type": ["string", "null"]},
+    "docs_url": {"type": "string", "format": "uri"},
+    "correlation_id": {"type": "string", "format": "uuid"}
+  }
+}

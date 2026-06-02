@@ -1,0 +1,212 @@
+# whisper-macos-cli
+
+> macOS-exclusive CLI for local audio transcription via whisper.cpp with Metal GPU acceleration
+
+whisper-macos-cli is a Rust CLI that transcribes audio files to text using
+whisper.cpp with Apple Silicon Metal GPU. It accepts audio via file
+arguments or stdin pipe and emits JSON on stdout. Designed for AI agent
+integration with a strict stdin/stdout JSON contract.
+
+## Key Features
+
+- Metal GPU acceleration on Apple Silicon (M1/M2/M3/M4)
+- Maximum quality defaults: large-v3 model, BeamSearch beam_size=8
+- Supports: MP3, OGG/Vorbis, OGG/Opus (WhatsApp), FLAC, WAV, AAC
+- Auto-detects language from macOS system locale
+- VAD-based chunking prevents hallucinations via earshot (Silero)
+- NDJSON mode for batch processing with summary line
+- correlation_id UUID v7 in every output for traceability
+- schema_version in every output for evolution safety
+- HTTPS-only model downloads with User-Agent identification
+- Local-only: zero telemetry, zero phone-home
+
+## Quick Start
+
+```bash
+cargo install whisper-macos-cli
+whisper-macos-cli models download
+whisper-macos-cli transcribe audio.ogg
+```
+
+## Contract
+
+### Input
+
+- Audio files as positional arguments or piped via stdin
+- Supported formats: MP3, OGG/Vorbis, OGG/Opus, FLAC, WAV, AAC
+- Stdin requires non-TTY (pipe or redirect)
+
+### Output
+
+- stdout: JSON (single file) or NDJSON (multiple files with --ndjson)
+- stderr: tracing logs (suppressed with --quiet)
+- Exit codes follow sysexits.h convention
+
+### JSON Envelope (every output)
+
+```json
+{
+  "schema_version": "0.1.0",
+  "correlation_id": "0190a3b4-7c8d-7abc-9def-1234567890ab",
+  "...": "command-specific fields"
+}
+```
+
+### Transcription Result
+
+```json
+{
+  "schema_version": "0.1.0",
+  "correlation_id": "0190a3b4-7c8d-7abc-9def-1234567890ab",
+  "file": "voice.ogg",
+  "language": "pt",
+  "language_source": "os_locale",
+  "model": "large-v3",
+  "duration_seconds": 45.2,
+  "text": "Full transcription text here",
+  "vad_chunks": 3,
+  "processing_time_ms": 8432
+}
+```
+
+### Error Envelope
+
+```json
+{
+  "schema_version": "0.1.0",
+  "error": true,
+  "code": 66,
+  "message": "input not found: /tmp/missing.ogg",
+  "category": "input",
+  "retryable": false,
+  "retry_after_ms": null,
+  "hint": "check the file path and try again",
+  "docs_url": "https://github.com/.../docs/TROUBLESHOOTING.md",
+  "correlation_id": "0190a3b4-7c8d-7abc-9def-1234567890ab"
+}
+```
+
+## Subcommands
+
+| Subcommand  | Purpose                                |
+|-------------|----------------------------------------|
+| transcribe  | Transcribe one or more audio files     |
+| models      | Download, list, locate, or remove models|
+| doctor      | Diagnose environment and dependencies  |
+| schema      | Emit full JSON Schema envelope         |
+| config      | Emit current effective configuration   |
+| completions | Generate shell completions             |
+| commands    | Emit command tree as JSON              |
+| init        | Generate SKILL.md and AGENTS.md        |
+| licenses    | Print third-party license attribution  |
+| resume      | Resume a previous batch (v0.1: no-op)  |
+
+## Global Flags
+
+| Flag                  | Purpose                                |
+|-----------------------|----------------------------------------|
+| --quiet               | Suppress stderr output                 |
+| -v / -vv / -vvv       | Increase verbosity                     |
+| --print-schema        | Print JSON schema and exit             |
+| --print-config        | Print effective config and exit        |
+| --no-input            | Disable interactive fallbacks          |
+| --color auto/always/never | Control colored output             |
+
+## Transcribe Flags
+
+| Flag                    | Default   | Purpose                       |
+|-------------------------|-----------|-------------------------------|
+| --language LANG         | os locale | Force language                |
+| --model MODEL           | large-v3  | Whisper model to use          |
+| --beam-size N           | 8         | Beam search width             |
+| --timestamps            | false     | Include segments              |
+| --ndjson                | false     | NDJSON output                 |
+| --output-format FMT     | json      | json or ndjson                |
+| --vad-threshold FLOAT   | 0.5       | VAD threshold                 |
+| --concurrency N         | 2         | Parallel transcriptions      |
+| --input-format FMT      | auto      | Force input format            |
+| --dry-run               | false     | Resolve without transcribing  |
+| --timeout SECS          | -         | Per-attempt request timeout   |
+| --retry-count N         | -         | Retry attempts                |
+| --retry-max-elapsed SECS| -         | Total retry budget            |
+| --offline               | false     | Fail fast in air-gapped mode  |
+| --resume WORKFLOW_ID    | -         | Resume previous batch         |
+
+## Environment Variables
+
+| Variable           | Purpose                                      |
+|--------------------|----------------------------------------------|
+| WHISPER_MODEL      | Override default model                       |
+| WHISPER_LANGUAGE   | Override default language                    |
+| NO_COLOR           | Disable colored output                       |
+| CI                 | Disable interactive prompts (1/true/yes)     |
+| RUST_LOG           | Override tracing log level filter            |
+| SOURCE_DATE_EPOCH  | Unix timestamp for reproducible builds       |
+| NO_INPUT           | Override --no-input flag                      |
+| QUIET              | Override --quiet flag                        |
+
+## Exit Codes
+
+- 0: success
+- 2: usage error
+- 64: no input provided
+- 65: invalid audio data
+- 66: input file not found
+- 69: service unavailable
+- 70: inference error
+- 74: I/O error
+- 78: configuration error
+- 130: SIGINT (Ctrl+C)
+- 141: SIGPIPE
+- 143: SIGTERM
+
+## Documentation
+
+- AGENTS.md: Integration guide for AI agents
+- AGENTS.pt-BR.md: Brazilian Portuguese integration guide
+- SKILL.md: MCP/agent skill descriptor
+- README.md: Project overview
+- README.pt-BR.md: Brazilian Portuguese overview
+- docs/HOW_TO_USE.md: Advanced recipes
+- docs/COOKBOOK.md: 20+ worked examples
+- docs/INTEGRATIONS.md: 35+ integration patterns
+- docs/CROSS_PLATFORM.md: Platform support matrix
+- docs/TROUBLESHOOTING.md: Common errors and solutions
+- docs/FAQ.md: Frequently asked questions
+- CONTRIBUTING.md: Contribution workflow
+- SECURITY.md: Vulnerability reporting
+- CODE_OF_CONDUCT.md: Community standards
+- PRIVACY.md: Data handling
+- CHANGELOG.md: Release history
+
+## Models
+
+| Model    | Size      | Default | Description                |
+|----------|-----------|---------|----------------------------|
+| tiny     | ~75 MB    |         | Fastest, lowest accuracy   |
+| base     | ~142 MB   |         | Fast, basic accuracy       |
+| small    | ~466 MB   |         | Balanced speed/accuracy    |
+| medium   | ~1.5 GB   |         | High accuracy              |
+| large-v3 | ~3 GB     | yes     | Maximum accuracy           |
+
+## Token Budget
+
+- Invocation overhead: ~200 tokens (JSON envelope parsing)
+- Per-file transcription: ~50 tokens + transcribed text length
+- Error handling: ~100 tokens
+
+## Platform Requirements
+
+- macOS 13 or later
+- Apple Silicon (M1, M2, M3, M4)
+- Metal GPU acceleration (automatic)
+- cmake and Xcode CLI Tools for building from source
+- 4 GB free disk space for the default model
+
+## License
+
+MIT — see LICENSE
+
+## Third-Party Notices
+
+See NOTICE and THIRD-PARTY-LICENSES.md (generated via `cargo about`).

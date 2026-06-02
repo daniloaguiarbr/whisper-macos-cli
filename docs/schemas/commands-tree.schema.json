@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/daniloaguiarbr/whisper-macos-cli/schemas/commands-tree/v0.1.0.json",
+  "title": "CommandsTree",
+  "description": "Full command tree emitted by whisper-macos-cli commands",
+  "type": "object",
+  "required": ["schema_version", "correlation_id", "name", "subcommands"],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "correlation_id": {"type": "string", "format": "uuid"},
+    "name": {"type": "string"},
+    "about": {"type": "string"},
+    "version": {"type": "string"},
+    "subcommands": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {"type": "string"},
+          "about": {"type": "string"},
+          "subcommands": {
+            "type": "array",
+            "items": {"type": "object"}
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/daniloaguiarbr/whisper-macos-cli/schemas/models-list/v0.1.0.json",
+  "title": "ModelsList",
+  "type": "object",
+  "required": ["schema_version", "correlation_id", "models", "total"],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "correlation_id": {"type": "string", "format": "uuid"},
+    "models": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "size_bytes", "min_size_bytes", "downloaded", "description"],
+        "properties": {
+          "name": {"type": "string"},
+          "size_bytes": {"type": "integer", "minimum": 0},
+          "min_size_bytes": {"type": "integer", "minimum": 0},
+          "downloaded": {"type": "boolean"},
+          "description": {"type": "string"}
+        }
+      }
+    },
+    "total": {"type": "integer", "minimum": 0}
+  }
+}

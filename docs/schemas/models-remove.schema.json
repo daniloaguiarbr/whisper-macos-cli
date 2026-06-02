@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/daniloaguiarbr/whisper-macos-cli/schemas/models-remove/v0.1.0.json",
+  "title": "ModelsRemoveStatus",
+  "type": "object",
+  "required": ["schema_version", "correlation_id", "model", "action"],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "correlation_id": {"type": "string", "format": "uuid"},
+    "model": {"type": "string"},
+    "action": {
+      "type": "string",
+      "enum": ["would_remove", "removed"]
+    },
+    "path": {"type": ["string", "null"]},
+    "size_bytes": {"type": ["integer", "null"]}
+  }
+}

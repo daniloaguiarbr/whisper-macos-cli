@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/daniloaguiarbr/whisper-macos-cli/schemas/schema-envelope/v0.1.0.json",
+  "title": "SchemaEnvelope",
+  "description": "Self-describing envelope emitted by whisper-macos-cli schema",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "correlation_id",
+    "agentNotes",
+    "invariants",
+    "sideEffects",
+    "idempotent",
+    "checkpointable",
+    "tokenBudget",
+    "result_schema"
+  ],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "correlation_id": {"type": "string", "format": "uuid"},
+    "agentNotes": {"type": "string"},
+    "invariants": {"type": "array", "items": {"type": "string"}},
+    "sideEffects": {"type": "array", "items": {"type": "string"}},
+    "idempotent": {"type": "boolean"},
+    "checkpointable": {"type": "boolean"},
+    "tokenBudget": {
+      "type": "object",
+      "properties": {
+        "invocation_overhead": {"type": "integer"},
+        "per_file_transcription": {"type": "string"}
+      }
+    },
+    "result_schema": {"type": "object"},
+    "error_schema": {"type": "object"}
+  }
+}
