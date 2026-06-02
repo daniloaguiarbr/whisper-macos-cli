@@ -78,7 +78,7 @@ opus-decoder = "0.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order"] }
 unicode-normalization = "0.1"
-sha2 = "0.10"
+sha2 = "0.11"
 hex = "0.4"
 uuid = { version = "1", features = ["v7", "serde"] }
 human-panic = "2"
