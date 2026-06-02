@@ -9,6 +9,12 @@ e este projeto adota [Semantic Versioning](https://semver.org/lang/pt-BR/spec/v2
 
 ## [Não Lançado]
 
+### Alterado
+
+- Licença alterada de MIT-only para dual MIT OR Apache-2.0
+- `LICENSE-MIT` e `LICENSE-APACHE` substituem o arquivo único `LICENSE`
+- Campo `license` em `Cargo.toml` agora é `MIT OR Apache-2.0`
+
 ### Adicionado
 
 - Verificação de integridade SHA256 no download de modelos

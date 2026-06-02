@@ -4,7 +4,7 @@
 
 [![Crates.io](https://img.shields.io/crates/v/whisper-macos-cli.svg)](https://crates.io/crates/whisper-macos-cli)
 [![Documentation](https://docs.rs/whisper-macos-cli/badge.svg)](https://docs.rs/whisper-macos-cli)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT OR Apache-2.0](https://img.shields.io/badge/License-MIT_OR_Apache--2.0-yellow.svg)](https://opensource.org/licenses/MIT)
 [![CI](https://github.com/daniloaguiarbr/whisper-macos-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/daniloaguiarbr/whisper-macos-cli/actions)
 [![codecov](https://codecov.io/gh/daniloaguiarbr/whisper-macos-cli/branch/main/graph/badge.svg)](https://codecov.io/gh/daniloaguiarbr/whisper-macos-cli)
 [![Audit](https://img.shields.io/badge/audit-cargo%20audit-blue)](https://github.com/rustsec/rustsec)
@@ -218,5 +218,10 @@ current development version is documented under `## [Unreleased]`.
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Third-party notices in
-[NOTICE](NOTICE) and via `whisper-macos-cli licenses`.
+Dual-licensed under either of:
+
+- Apache License, Version 2.0 — see [LICENSE-APACHE](LICENSE-APACHE)
+- MIT License — see [LICENSE-MIT](LICENSE-MIT)
+
+at your option. Third-party notices in [NOTICE](NOTICE) and via
+`whisper-macos-cli licenses`.

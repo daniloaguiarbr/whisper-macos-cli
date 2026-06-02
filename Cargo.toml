@@ -5,7 +5,7 @@ edition = "2024"
 rust-version = "1.88"
 authors = ["Danilo Teixeira <danilo@example.com>"]
 description = "Transcribe audio files locally on Apple Silicon via whisper.cpp with Metal GPU acceleration, exposing a strict stdin/stdout JSON contract for AI agents and Unix pipelines."
-license = "MIT"
+license = "MIT OR Apache-2.0"
 homepage = "https://github.com/daniloaguiarbr/whisper-macos-cli"
 repository = "https://github.com/daniloaguiarbr/whisper-macos-cli"
 keywords = ["whisper", "transcription", "macos", "audio", "ai-agents"]
@@ -32,7 +32,8 @@ include = [
     "INTEGRATIONS.pt-BR.md",
     "PRIVACY.md",
     "PRIVACY.pt-BR.md",
-    "LICENSE",
+    "LICENSE-MIT",
+    "LICENSE-APACHE",
     "NOTICE",
     "AGENTS.md",
     "AGENTS.pt-BR.md",

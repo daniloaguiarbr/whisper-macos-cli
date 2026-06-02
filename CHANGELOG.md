@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- License changed from MIT-only to dual MIT OR Apache-2.0
+- `LICENSE-MIT` and `LICENSE-APACHE` replace the single `LICENSE` file
+- `Cargo.toml` license field is now `MIT OR Apache-2.0`
+
 ### Added
 
 - SHA256 integrity verification on model downloads
