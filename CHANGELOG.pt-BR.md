@@ -127,5 +127,14 @@ e este projeto adota [Semantic Versioning](https://semver.org/lang/pt-BR/spec/v2
 - Filtragem de alucinações e colapso de repetições consecutivas
 - AGENTS.md, SKILL.md, llms.txt para descoberta por agentes
 
-[Não Lançado]: https://github.com/daniloaguiarbr/whisper-macos-cli/compare/v0.1.0...HEAD
+## [0.1.1] - 2026-06-02
+
+### Alterado
+
+- Licença alterada de MIT-only para dual MIT OR Apache-2.0
+- `LICENSE-MIT` e `LICENSE-APACHE` substituem o arquivo único `LICENSE`
+- Campo `license` em `Cargo.toml` agora é `MIT OR Apache-2.0`
+
+[Não Lançado]: https://github.com/daniloaguiarbr/whisper-macos-cli/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/daniloaguiarbr/whisper-macos-cli/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/daniloaguiarbr/whisper-macos-cli/releases/tag/v0.1.0
