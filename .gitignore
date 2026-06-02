@@ -7,6 +7,10 @@ docs_rules_cli/
 
 # Build artifacts
 target/
+lcov.info
+
+# Test artifacts
+tests/proptest_*.proptest-regressions
 
 # OS
 .DS_Store

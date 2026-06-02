@@ -1,0 +1,16 @@
+---
+source: tests/snapshots.rs
+expression: json
+---
+{
+  "schema_version": "0.1.1",
+  "error": true,
+  "code": 69,
+  "message": "unsupported platform: macOS with Apple Silicon required",
+  "category": "service",
+  "retryable": false,
+  "retry_after_ms": null,
+  "hint": "this CLI requires macOS with Apple Silicon (M1+)",
+  "docs_url": "https://github.com/daniloaguiarbr/whisper-macos-cli/blob/main/README.md#platform-requirements",
+  "correlation_id": "44444444-4444-4444-4444-444444444444"
+}

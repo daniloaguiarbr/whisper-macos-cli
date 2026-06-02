@@ -219,4 +219,81 @@ mod tests {
         let result = collapse_consecutive_repeats(input);
         assert_eq!(result, input);
     }
+
+    #[test]
+    fn filter_hallucinations_handles_empty_input() {
+        assert_eq!(filter_hallucinations(""), "");
+    }
+
+    #[test]
+    fn filter_hallucinations_handles_only_whitespace() {
+        let input = "   \n\n\t\n   ";
+        let result = filter_hallucinations(input);
+        assert!(result.trim().is_empty() || result.is_empty());
+    }
+
+    #[test]
+    fn filter_hallucinations_case_insensitive_legendas() {
+        let input = "Real text\nLEGENDA POR comunidade\nMore real text";
+        let result = filter_hallucinations(input);
+        assert!(!result.contains("legenda"));
+        assert!(!result.contains("LEGENDA"));
+        assert!(result.contains("Real text"));
+        assert!(result.contains("More real text"));
+    }
+
+    #[test]
+    fn filter_hallucinations_strips_amara_url() {
+        let input = "Hello\namara.org\nWorld";
+        let result = filter_hallucinations(input);
+        assert!(!result.contains("amara"));
+    }
+
+    #[test]
+    fn filter_hallucinations_strips_subscribe() {
+        let input = "Real text\ninscreva-se no canal\nMore text";
+        let result = filter_hallucinations(input);
+        assert!(!result.contains("inscreva"));
+    }
+
+    #[test]
+    fn filter_hallucinations_strips_www_url() {
+        let input = "Hello\nwww.example.com\nWorld";
+        let result = filter_hallucinations(input);
+        assert!(!result.contains("www."));
+    }
+
+    #[test]
+    fn filter_hallucinations_strips_transcricao_por() {
+        let input = "Real text\ntranscrição por fulano\nMore text";
+        let result = filter_hallucinations(input);
+        assert!(!result.contains("transcrição por"));
+    }
+
+    #[test]
+    fn filter_hallucinations_strips_transcricao_e_legendas() {
+        let input = "Real text\ntranscrição e legendas\nMore text";
+        let result = filter_hallucinations(input);
+        assert!(!result.contains("transcrição e legendas"));
+    }
+
+    #[test]
+    fn collapse_consecutive_repeats_handles_empty_input() {
+        assert_eq!(collapse_consecutive_repeats(""), "");
+    }
+
+    #[test]
+    fn collapse_consecutive_repeats_collapses_three_in_a_row() {
+        let input = "Hello\nHello\nHello\nWorld";
+        let result = collapse_consecutive_repeats(input);
+        assert_eq!(result, "Hello\nWorld");
+    }
+
+    #[test]
+    fn collapse_consecutive_repeats_preserves_blank_lines() {
+        let input = "Hello\n\nWorld";
+        let result = collapse_consecutive_repeats(input);
+        assert!(result.contains("Hello"));
+        assert!(result.contains("World"));
+    }
 }

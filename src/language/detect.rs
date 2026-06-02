@@ -4,7 +4,7 @@ pub fn detect_language() -> &'static str {
     map_to_whisper_code(lang_code)
 }
 
-fn map_to_whisper_code(code: &str) -> &'static str {
+pub fn map_to_whisper_code(code: &str) -> &'static str {
     match code {
         "af" => "af",
         "am" => "am",
@@ -150,5 +150,60 @@ mod tests {
         let (lang, source) = resolve_language(None);
         assert!(!lang.is_empty());
         assert_eq!(source, "os_locale");
+    }
+
+    #[test]
+    fn map_to_whisper_code_returns_known_codes() {
+        for code in &["pt", "en", "es", "fr", "de", "it", "ja", "zh", "ru", "ar"] {
+            assert_eq!(
+                map_to_whisper_code(code),
+                *code,
+                "code {code} should be identity"
+            );
+        }
+    }
+
+    #[test]
+    fn map_to_whisper_code_falls_back_to_english_for_unknown() {
+        for code in &["xx", "klingon", "elvish", "na", ""] {
+            assert_eq!(
+                map_to_whisper_code(code),
+                "en",
+                "unknown {code} should fallback to en"
+            );
+        }
+    }
+
+    #[test]
+    fn map_to_whisper_code_returns_non_empty_for_all_iso_639_1() {
+        let codes = [
+            "aa", "ab", "af", "ak", "am", "ar", "as", "ay", "az", "ba", "be", "bg", "bh", "bi",
+            "bm", "bn", "bo", "br", "bs", "ca", "ce", "ch", "co", "cr", "cs", "cu", "cv", "cy",
+            "da", "de", "dv", "dz", "ee", "el", "en", "eo", "es", "et", "eu", "fa", "ff", "fi",
+            "fj", "fo", "fr", "fy", "ga", "gd", "gl", "gn", "gu", "gv", "ha", "he", "hi", "ho",
+            "hr", "ht", "hu", "hy", "hz", "ia", "id", "ie", "ig", "ii", "ik", "io", "is", "it",
+            "iu", "ja", "jv", "ka", "kg", "ki", "kj", "kk", "kl", "km", "kn", "ko", "kr", "ks",
+            "ku", "kv", "kw", "ky", "la", "lb", "lg", "li", "ln", "lo", "lt", "lu", "lv", "mg",
+            "mh", "mi", "mk", "ml", "mn", "mr", "ms", "mt", "my", "na", "nb", "nd", "ne", "ng",
+            "nl", "nn", "no", "nr", "nv", "ny", "oc", "oj", "om", "or", "os", "pa", "pi", "pl",
+            "ps", "pt", "qu", "rm", "rn", "ro", "ru", "rw", "sa", "sc", "sd", "se", "sg", "si",
+            "sk", "sl", "sm", "sn", "so", "sq", "sr", "ss", "st", "su", "sv", "sw", "ta", "te",
+            "tg", "th", "ti", "tk", "tl", "tn", "to", "tr", "ts", "tt", "tw", "ty", "ug", "uk",
+            "ur", "uz", "ve", "vi", "vo", "wa", "wo", "xh", "yi", "yo", "za", "zh", "zu",
+        ];
+        for code in &codes {
+            let result = map_to_whisper_code(code);
+            assert!(!result.is_empty(), "code {code} should not return empty");
+        }
+    }
+
+    #[test]
+    fn map_to_whisper_code_handles_short_codes() {
+        assert_eq!(map_to_whisper_code("pt"), "pt");
+        assert_eq!(map_to_whisper_code("en"), "en");
+        assert_eq!(map_to_whisper_code("es"), "es");
+        assert_eq!(map_to_whisper_code("zh"), "zh");
+        assert_eq!(map_to_whisper_code("ar"), "ar");
+        assert_eq!(map_to_whisper_code("ja"), "ja");
     }
 }

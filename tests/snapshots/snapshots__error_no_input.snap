@@ -1,0 +1,16 @@
+---
+source: tests/snapshots.rs
+expression: json
+---
+{
+  "schema_version": "0.1.1",
+  "error": true,
+  "code": 64,
+  "message": "no audio input provided",
+  "category": "usage",
+  "retryable": false,
+  "retry_after_ms": null,
+  "hint": "provide audio file(s) as arguments or pipe via stdin",
+  "docs_url": "https://github.com/daniloaguiarbr/whisper-macos-cli/blob/main/AGENTS.md#contract",
+  "correlation_id": "00000000-0000-0000-0000-000000000000"
+}

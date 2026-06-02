@@ -1,0 +1,16 @@
+---
+source: tests/snapshots.rs
+expression: json
+---
+{
+  "schema_version": "0.1.1",
+  "error": true,
+  "code": 78,
+  "message": "model not found: huge",
+  "category": "config",
+  "retryable": false,
+  "retry_after_ms": null,
+  "hint": "run 'whisper-macos-cli models list' to see available models",
+  "docs_url": "https://github.com/daniloaguiarbr/whisper-macos-cli/blob/main/AGENTS.md#model-management",
+  "correlation_id": "22222222-2222-2222-2222-222222222222"
+}

@@ -225,4 +225,53 @@ mod tests {
         assert!(USER_AGENT.starts_with("whisper-macos-cli/"));
         assert!(USER_AGENT.contains(env!("TARGET")));
     }
+
+    #[test]
+    fn is_transient_detects_5xx_responses() {
+        let err =
+            crate::error::Error::ModelDownload(anyhow::anyhow!("HTTP 503 Service Unavailable"));
+        assert!(is_transient(&err));
+    }
+
+    #[test]
+    fn is_transient_detects_429_rate_limit() {
+        let err = crate::error::Error::ModelDownload(anyhow::anyhow!("HTTP 429 Too Many Requests"));
+        assert!(is_transient(&err));
+    }
+
+    #[test]
+    fn is_transient_detects_408_timeout() {
+        let err = crate::error::Error::ModelDownload(anyhow::anyhow!("HTTP 408 Request Timeout"));
+        assert!(is_transient(&err));
+    }
+
+    #[test]
+    fn is_transient_detects_connection_errors() {
+        let err = crate::error::Error::ModelDownload(anyhow::anyhow!("connection refused"));
+        assert!(is_transient(&err));
+    }
+
+    #[test]
+    fn is_transient_rejects_4xx_other() {
+        let err = crate::error::Error::ModelDownload(anyhow::anyhow!("HTTP 404 Not Found"));
+        assert!(!is_transient(&err));
+    }
+
+    #[test]
+    fn is_transient_rejects_below_min_size() {
+        let err = crate::error::Error::ModelDownload(anyhow::anyhow!(
+            "downloaded 50 bytes is below minimum 70000000 — likely partial"
+        ));
+        assert!(!is_transient(&err));
+    }
+
+    #[test]
+    fn fastrand_u64_is_deterministic_per_thread() {
+        let a = fastrand_u64();
+        let b = fastrand_u64();
+        let c = fastrand_u64();
+        assert_ne!(a, b);
+        assert_ne!(b, c);
+        assert_ne!(a, c);
+    }
 }

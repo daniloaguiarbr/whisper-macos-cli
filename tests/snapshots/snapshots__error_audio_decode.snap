@@ -1,0 +1,16 @@
+---
+source: tests/snapshots.rs
+expression: json
+---
+{
+  "schema_version": "0.1.1",
+  "error": true,
+  "code": 65,
+  "message": "audio decode failed: probe failed: unsupported codec",
+  "category": "data",
+  "retryable": false,
+  "retry_after_ms": null,
+  "hint": "verify the file is a valid audio format (ogg, mp3, wav, flac)",
+  "docs_url": "https://github.com/daniloaguiarbr/whisper-macos-cli/blob/main/docs/TROUBLESHOOTING.md#audio-decode",
+  "correlation_id": "77777777-7777-7777-7777-777777777777"
+}

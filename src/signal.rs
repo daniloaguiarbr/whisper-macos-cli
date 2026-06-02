@@ -124,4 +124,61 @@ mod tests {
     fn shutdown_reason_default_is_none() {
         assert_eq!(shutdown_reason(), ShutdownReason::None);
     }
+
+    #[test]
+    fn shutdown_reason_from_u8_mapping() {
+        assert_eq!(ShutdownReason::from_u8(0), ShutdownReason::None);
+        assert_eq!(ShutdownReason::from_u8(1), ShutdownReason::Sigint);
+        assert_eq!(ShutdownReason::from_u8(2), ShutdownReason::Sigterm);
+        assert_eq!(ShutdownReason::from_u8(3), ShutdownReason::None);
+        assert_eq!(ShutdownReason::from_u8(99), ShutdownReason::None);
+        assert_eq!(ShutdownReason::from_u8(255), ShutdownReason::None);
+    }
+
+    #[test]
+    fn shutdown_signal_exit_codes() {
+        assert_eq!(shutdown_signal_exit_code(), 0);
+    }
+
+    #[test]
+    fn is_shutdown_requested_initially_false() {
+        assert!(!is_shutdown_requested());
+    }
+
+    #[test]
+    fn is_forced_exit_initially_false() {
+        assert!(!is_forced_exit());
+    }
+
+    #[test]
+    fn cleanup_partial_downloads_handles_empty_slice() {
+        cleanup_partial_downloads(&[]);
+    }
+
+    #[test]
+    fn cleanup_partial_downloads_handles_missing_files() {
+        let paths = vec![
+            std::path::PathBuf::from("/tmp/does_not_exist_xyz_1.tmp"),
+            std::path::PathBuf::from("/tmp/does_not_exist_xyz_2.tmp"),
+        ];
+        cleanup_partial_downloads(&paths);
+    }
+
+    #[test]
+    fn cleanup_partial_downloads_removes_existing_file() {
+        let dir = std::env::temp_dir().join(format!("whisper_cleanup_{}", std::process::id()));
+        let _ = std::fs::create_dir_all(&dir);
+        let file = dir.join("test.tmp");
+        std::fs::write(&file, b"data").unwrap();
+        assert!(file.exists());
+        cleanup_partial_downloads(&[file.clone()]);
+        assert!(!file.exists());
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn wait_or_timeout_returns_false_when_no_shutdown() {
+        let result = wait_or_timeout(std::time::Duration::from_millis(100));
+        assert!(!result);
+    }
 }

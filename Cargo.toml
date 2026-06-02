@@ -52,6 +52,7 @@ include = [
 default = ["metal"]
 metal = []
 mcp = []
+slow-tests = []
 
 [dependencies]
 clap = { version = "4", features = ["derive", "wrap_help", "string", "env"] }
@@ -109,3 +110,4 @@ wiremock = "0.6"
 tempfile = "3"
 serial_test = "3"
 proptest = "1"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "time"] }

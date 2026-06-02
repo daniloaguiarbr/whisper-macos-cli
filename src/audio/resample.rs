@@ -63,3 +63,46 @@ pub fn resample_to_16khz(
         .map(|&s| (s.clamp(-1.0, 1.0) * 32767.0) as i16)
         .collect())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn resample_passthrough_when_already_16khz() {
+        let input = vec![100i16, 200, 300, 400];
+        let result = resample_to_16khz(&input, 16000).unwrap();
+        assert_eq!(result, input);
+    }
+
+    #[test]
+    fn resample_handles_empty_input_at_non_target_rate() {
+        let result = resample_to_16khz(&[], 44100).unwrap();
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn resample_44100_to_16000_produces_output() {
+        let input: Vec<i16> = (0..4410).map(|i| (i % 1000) as i16).collect();
+        let result = resample_to_16khz(&input, 44100).unwrap();
+        assert!(!result.is_empty());
+        let expected_min = input.len() * 16 / 44 / 2;
+        let expected_max = input.len() * 16 / 44 * 2;
+        assert!(result.len() >= expected_min);
+        assert!(result.len() <= expected_max);
+    }
+
+    #[test]
+    fn resample_48000_to_16000_produces_output() {
+        let input: Vec<i16> = (0..4800).map(|i| ((i * 7) % 1000) as i16).collect();
+        let result = resample_to_16khz(&input, 48000).unwrap();
+        assert!(!result.is_empty());
+    }
+
+    #[test]
+    fn resample_8000_to_16000_doubles_samples() {
+        let input: Vec<i16> = (0..800).map(|i| i as i16).collect();
+        let result = resample_to_16khz(&input, 8000).unwrap();
+        assert!(result.len() >= 1500);
+    }
+}

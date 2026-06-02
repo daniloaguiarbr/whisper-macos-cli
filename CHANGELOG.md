@@ -12,6 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - License changed from MIT-only to dual MIT OR Apache-2.0
 - `LICENSE-MIT` and `LICENSE-APACHE` replace the single `LICENSE` file
 - `Cargo.toml` license field is now `MIT OR Apache-2.0`
+- CI switched from `cargo test` to `cargo nextest` with `ci` profile
+- Codecov threshold raised from `1%` to `70%` with `fail_ci_if_error: true`
+- `cargo-deny` schema updated to v0.19 (new `notice`/`unmaintained` keys)
+- `Error` enum marked `#[non_exhaustive]` for SemVer stability
+- `map_to_whisper_code` exposed as `pub` for property testing
 
 ### Added
 
@@ -28,6 +33,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `docs_url` field in error envelope
 - `retry_after_ms` field in error envelope
 - NDJSON summary line at end of batch operations
+- `slow-tests` feature gate for heavy audio integration test
+- `.config/nextest.toml` with `default`, `ci`, `heavy`, `quick` profiles
+- `benches/audio_benches.rs` with 10 criterion benchmarks
+- 9 new test files: `proptest_filters`, `proptest_vad`, `proptest_language`, `snapshots`, `wiremock_download`, `tempfile_storage`, `concurrent_shutdown`, `cli_subprocess` (9 inline snapshot files)
+- 6 new CI jobs: `geiger`, `feature-matrix`, `test` with `cargo-hack each-feature`
+- `RUST_BACKTRACE=1` enabled in CI for diagnostic
+- Doc test for `Error::to_json` envelope contract
+
+### Test Suite
+
+- 180 tests total: 99 unit + 81 integration
+- 0 tests ignored without `#[cfg_attr(feature = "slow-tests")]`
+- 70.77% line coverage, 79.41% function coverage (target 70%)
 - SIGINT handler with cleanup (no longer calls `process::exit`)
 - SIGTERM handler with graceful shutdown
 - Double-tap Ctrl+C forces immediate exit

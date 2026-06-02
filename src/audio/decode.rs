@@ -407,4 +407,95 @@ mod tests {
         };
         assert!((pcm.duration_seconds() - 2.0).abs() < 0.001);
     }
+
+    #[test]
+    fn pcm_data_duration_with_zero_sample_rate_is_zero() {
+        let pcm = PcmData {
+            samples: vec![100i16; 1000],
+            sample_rate: 0,
+            channels: 1,
+        };
+        assert_eq!(pcm.duration_seconds(), 0.0);
+    }
+
+    #[test]
+    fn pcm_data_duration_with_zero_channels_is_zero() {
+        let pcm = PcmData {
+            samples: vec![100i16; 1000],
+            sample_rate: 16000,
+            channels: 0,
+        };
+        assert_eq!(pcm.duration_seconds(), 0.0);
+    }
+
+    #[test]
+    fn pcm_data_duration_with_empty_samples_is_zero() {
+        let pcm = PcmData {
+            samples: Vec::new(),
+            sample_rate: 16000,
+            channels: 1,
+        };
+        assert_eq!(pcm.duration_seconds(), 0.0);
+    }
+
+    #[test]
+    fn pcm_data_duration_stereo_divides_by_channels() {
+        let pcm = PcmData {
+            samples: vec![0i16; 16000 * 2 * 2],
+            sample_rate: 16000,
+            channels: 2,
+        };
+        assert!((pcm.duration_seconds() - 2.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn to_mono_handles_empty_input() {
+        let result = to_mono(&[], 1);
+        assert!(result.is_empty());
+        let result = to_mono(&[], 2);
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn to_mono_six_channels_averages() {
+        let samples = vec![100i16, 200, 300, 400, 500, 600];
+        let result = to_mono(&samples, 6);
+        assert_eq!(result.len(), 1);
+        assert_eq!(result[0], 350);
+    }
+
+    #[test]
+    fn to_mono_quad_channel_averages() {
+        let samples = vec![100i16, 200, 300, 400];
+        let result = to_mono(&samples, 4);
+        assert_eq!(result, vec![250]);
+    }
+
+    #[test]
+    fn i16_to_f32_handles_min_max_boundary() {
+        let samples = vec![i16::MIN, i16::MAX, 0i16];
+        let result = i16_to_f32(&samples);
+        assert!((result[0] - (-1.0)).abs() < 0.001);
+        assert!((result[1] - 1.0).abs() < 0.001);
+        assert!((result[2] - 0.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn i16_to_f32_handles_empty_input() {
+        let result = i16_to_f32(&[]);
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn ogg_opus_magic_rejects_truncated_headers() {
+        assert!(!is_ogg_opus_magic(b"Og"));
+        assert!(!is_ogg_opus_magic(b"Ogg"));
+        assert!(!is_ogg_opus_magic(b""));
+    }
+
+    #[test]
+    fn ogg_opus_magic_accepts_full_header() {
+        let ogg = b"OggS\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
+        assert!(is_ogg_opus_magic(ogg));
+    }
 }

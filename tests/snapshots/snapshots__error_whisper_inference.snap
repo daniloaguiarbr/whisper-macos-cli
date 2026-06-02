@@ -1,0 +1,16 @@
+---
+source: tests/snapshots.rs
+expression: json
+---
+{
+  "schema_version": "0.1.1",
+  "error": true,
+  "code": 70,
+  "message": "whisper inference failed: segment 0 out of bounds",
+  "category": "internal",
+  "retryable": false,
+  "retry_after_ms": null,
+  "hint": "try a smaller model with --model base",
+  "docs_url": "https://github.com/daniloaguiarbr/whisper-macos-cli/blob/main/docs/TROUBLESHOOTING.md#inference",
+  "correlation_id": "55555555-5555-5555-5555-555555555555"
+}

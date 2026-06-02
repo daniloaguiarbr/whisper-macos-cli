@@ -1,0 +1,16 @@
+---
+source: tests/snapshots.rs
+expression: json
+---
+{
+  "schema_version": "0.1.1",
+  "error": true,
+  "code": 78,
+  "message": "configuration error: invalid model path",
+  "category": "config",
+  "retryable": false,
+  "retry_after_ms": null,
+  "hint": "run 'whisper-macos-cli doctor' to diagnose",
+  "docs_url": "https://github.com/daniloteixeira/Dropbox/ai/dev/rust/macos/whisper-macos-cli/blob/main/docs/TROUBLESHOOTING.md",
+  "correlation_id": "66666666-6666-6666-6666-666666666666"
+}

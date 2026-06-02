@@ -1,0 +1,16 @@
+---
+source: tests/snapshots.rs
+expression: json
+---
+{
+  "schema_version": "0.1.1",
+  "error": true,
+  "code": 69,
+  "message": "model download failed: HTTP 503 Service Unavailable",
+  "category": "service",
+  "retryable": true,
+  "retry_after_ms": 2000,
+  "hint": "check network connectivity and retry",
+  "docs_url": "https://github.com/daniloaguiarbr/whisper-macos-cli/blob/main/docs/TROUBLESHOOTING.md#model-download",
+  "correlation_id": "33333333-3333-3333-3333-333333333333"
+}

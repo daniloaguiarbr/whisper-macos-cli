@@ -1,6 +1,7 @@
 use std::process::ExitCode;
 
 #[derive(Debug, thiserror::Error)]
+#[non_exhaustive]
 pub enum Error {
     #[error("no audio input provided")]
     NoInput,
@@ -146,6 +147,26 @@ impl Error {
     }
 }
 
+/// Build a stable JSON error envelope from any [`Error`].
+///
+/// # Example
+///
+/// ```
+/// use whisper_macos_cli::error::Error;
+///
+/// let err = Error::InputNotFound { path: "missing.ogg".to_string() };
+/// let envelope = err.to_json("test-correlation-id");
+/// assert_eq!(envelope["error"], true);
+/// assert_eq!(envelope["code"], 66);
+/// assert_eq!(envelope["category"], "input");
+/// assert_eq!(envelope["correlation_id"], "test-correlation-id");
+/// assert!(envelope["docs_url"].as_str().unwrap().starts_with("https://"));
+/// ```
+pub type ErrorEnvelope = serde_json::Value;
+
+#[doc(hidden)]
+pub fn _doc_test_compiles() {}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -183,5 +204,112 @@ mod tests {
         assert!(json["retry_after_ms"].is_number());
         assert!(json["docs_url"].is_string());
         assert_eq!(json["correlation_id"], "test-corr-id");
+    }
+
+    #[test]
+    fn error_json_uses_pkg_version_for_schema_version() {
+        let err = Error::NoInput;
+        let json = err.to_json("any");
+        assert_eq!(json["schema_version"], env!("CARGO_PKG_VERSION"));
+    }
+
+    #[test]
+    fn category_assignments_are_correct() {
+        assert_eq!(Error::NoInput.category(), "usage");
+        assert_eq!(
+            Error::InputNotFound { path: "x".into() }.category(),
+            "input"
+        );
+        assert_eq!(
+            Error::UnsupportedFormat { format: "x".into() }.category(),
+            "data"
+        );
+        assert_eq!(
+            Error::ModelNotFound { name: "x".into() }.category(),
+            "config"
+        );
+        assert_eq!(
+            Error::ModelDownload(anyhow::anyhow!("x")).category(),
+            "service"
+        );
+        assert_eq!(Error::UnsupportedPlatform.category(), "service");
+        assert_eq!(Error::WhisperInference("x".into()).category(), "internal");
+        assert_eq!(Error::Config("x".into()).category(), "config");
+    }
+
+    #[test]
+    fn retryable_only_model_download() {
+        assert!(Error::ModelDownload(anyhow::anyhow!("x")).retryable());
+        assert!(!Error::NoInput.retryable());
+        assert!(!Error::InputNotFound { path: "x".into() }.retryable());
+        assert!(!Error::UnsupportedFormat { format: "x".into() }.retryable());
+        assert!(!Error::ModelNotFound { name: "x".into() }.retryable());
+        assert!(!Error::WhisperInference("x".into()).retryable());
+        assert!(!Error::Config("x".into()).retryable());
+    }
+
+    #[test]
+    fn retry_after_ms_only_for_model_download() {
+        assert_eq!(
+            Error::ModelDownload(anyhow::anyhow!("x")).retry_after_ms(),
+            Some(2000)
+        );
+        assert_eq!(Error::NoInput.retry_after_ms(), None);
+        assert_eq!(Error::Config("x".into()).retry_after_ms(), None);
+    }
+
+    #[test]
+    fn hint_present_for_recoverable_errors() {
+        assert!(Error::NoInput.hint().is_some());
+        assert!(Error::InputNotFound { path: "x".into() }.hint().is_some());
+        assert!(Error::ModelNotFound { name: "x".into() }.hint().is_some());
+    }
+
+    #[test]
+    fn docs_url_is_full_github_url() {
+        for err in [
+            Error::NoInput,
+            Error::InputNotFound { path: "x".into() },
+            Error::ModelNotFound { name: "x".into() },
+            Error::UnsupportedPlatform,
+            Error::Config("x".into()),
+        ] {
+            let url = err.docs_url();
+            assert!(url.starts_with("https://"), "{url} should be https");
+        }
+    }
+
+    #[test]
+    fn error_display_messages_are_lowercase() {
+        let msgs = [
+            Error::NoInput.to_string(),
+            Error::InputNotFound { path: "x".into() }.to_string(),
+            Error::UnsupportedFormat { format: "x".into() }.to_string(),
+            Error::ModelNotFound { name: "x".into() }.to_string(),
+            Error::WhisperInference("x".into()).to_string(),
+            Error::UnsupportedPlatform.to_string(),
+        ];
+        for msg in msgs {
+            assert!(
+                !msg.ends_with('.'),
+                "msg `{msg}` should not end with period"
+            );
+        }
+    }
+
+    #[test]
+    fn exit_codes_match_sysexits_h() {
+        assert_eq!(Error::NoInput.exit_code(), 64);
+        assert_eq!(Error::InputNotFound { path: "x".into() }.exit_code(), 66);
+        assert_eq!(Error::AudioDecode(anyhow::anyhow!("x")).exit_code(), 65);
+        assert_eq!(
+            Error::UnsupportedFormat { format: "x".into() }.exit_code(),
+            65
+        );
+        assert_eq!(Error::ModelNotFound { name: "x".into() }.exit_code(), 78);
+        assert_eq!(Error::ModelDownload(anyhow::anyhow!("x")).exit_code(), 69);
+        assert_eq!(Error::WhisperInference("x".into()).exit_code(), 70);
+        assert_eq!(Error::UnsupportedPlatform.exit_code(), 69);
+        assert_eq!(Error::Config("x".into()).exit_code(), 78);
     }
 }

@@ -365,4 +365,92 @@ mod tests {
     fn cli_debug_assert() {
         Cli::command().debug_assert();
     }
+
+    #[test]
+    fn parse_beam_size_accepts_boundaries() {
+        assert_eq!(parse_beam_size("1").unwrap(), 1);
+        assert_eq!(parse_beam_size("8").unwrap(), 8);
+        assert_eq!(parse_beam_size("16").unwrap(), 16);
+    }
+
+    #[test]
+    fn parse_beam_size_rejects_below_range() {
+        assert!(parse_beam_size("0").is_err());
+        assert!(parse_beam_size("-1").is_err());
+    }
+
+    #[test]
+    fn parse_beam_size_rejects_above_range() {
+        assert!(parse_beam_size("17").is_err());
+        assert!(parse_beam_size("100").is_err());
+    }
+
+    #[test]
+    fn parse_beam_size_rejects_non_integer() {
+        assert!(parse_beam_size("abc").is_err());
+        assert!(parse_beam_size("1.5").is_err());
+        assert!(parse_beam_size("").is_err());
+    }
+
+    #[test]
+    fn parse_vad_threshold_accepts_boundaries() {
+        assert!((parse_vad_threshold("0.0").unwrap() - 0.0).abs() < f32::EPSILON);
+        assert!((parse_vad_threshold("0.5").unwrap() - 0.5).abs() < f32::EPSILON);
+        assert!((parse_vad_threshold("1.0").unwrap() - 1.0).abs() < f32::EPSILON);
+    }
+
+    #[test]
+    fn parse_vad_threshold_rejects_out_of_range() {
+        assert!(parse_vad_threshold("-0.1").is_err());
+        assert!(parse_vad_threshold("1.5").is_err());
+        assert!(parse_vad_threshold("2.0").is_err());
+    }
+
+    #[test]
+    fn parse_vad_threshold_rejects_non_float() {
+        assert!(parse_vad_threshold("abc").is_err());
+        assert!(parse_vad_threshold("").is_err());
+    }
+
+    #[test]
+    fn parse_concurrency_accepts_boundaries() {
+        assert_eq!(parse_concurrency("1").unwrap(), 1);
+        assert_eq!(parse_concurrency("16").unwrap(), 16);
+        assert_eq!(parse_concurrency("32").unwrap(), 32);
+    }
+
+    #[test]
+    fn parse_concurrency_rejects_below_range() {
+        assert!(parse_concurrency("0").is_err());
+    }
+
+    #[test]
+    fn parse_concurrency_rejects_above_range() {
+        assert!(parse_concurrency("33").is_err());
+        assert!(parse_concurrency("1000").is_err());
+    }
+
+    #[test]
+    fn parse_timeout_secs_accepts_valid_range() {
+        assert_eq!(parse_timeout_secs("1").unwrap(), 1);
+        assert_eq!(parse_timeout_secs("3600").unwrap(), 3600);
+    }
+
+    #[test]
+    fn parse_timeout_secs_rejects_out_of_range() {
+        assert!(parse_timeout_secs("0").is_err());
+        assert!(parse_timeout_secs("3601").is_err());
+    }
+
+    #[test]
+    fn parse_retry_count_accepts_max() {
+        assert_eq!(parse_retry_count("0").unwrap(), 0);
+        assert_eq!(parse_retry_count("10").unwrap(), 10);
+    }
+
+    #[test]
+    fn parse_retry_count_rejects_above_max() {
+        assert!(parse_retry_count("11").is_err());
+        assert!(parse_retry_count("100").is_err());
+    }
 }

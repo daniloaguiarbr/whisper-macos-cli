@@ -23,7 +23,7 @@ fn version_shows_semver_and_target() {
         .assert()
         .success()
         .stdout(predicates::str::contains("whisper-macos-cli"))
-        .stdout(predicates::str::contains("0.1.0"));
+        .stdout(predicates::str::contains(env!("CARGO_PKG_VERSION")));
 }
 
 #[test]
@@ -298,6 +298,7 @@ fn output_format_ndjson_accepted() {
 }
 
 #[test]
+#[cfg_attr(not(feature = "slow-tests"), ignore = "requires feature slow-tests")]
 fn transcribe_real_whatsapp_audio() {
     let test_audio = "/tmp/test_whatsapp_audio.ogg";
     if !std::path::Path::new(test_audio).exists() {

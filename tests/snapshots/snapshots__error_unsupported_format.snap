@@ -1,0 +1,16 @@
+---
+source: tests/snapshots.rs
+expression: json
+---
+{
+  "schema_version": "0.1.1",
+  "error": true,
+  "code": 65,
+  "message": "unsupported audio format: wma",
+  "category": "data",
+  "retryable": false,
+  "retry_after_ms": null,
+  "hint": "use --input-format to force a specific codec",
+  "docs_url": "https://github.com/daniloaguiarbr/whisper-macos-cli/blob/main/docs/TROUBLESHOOTING.md#unsupported-format",
+  "correlation_id": "88888888-8888-8888-8888-888888888888"
+}
