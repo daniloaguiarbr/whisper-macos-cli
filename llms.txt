@@ -38,12 +38,14 @@ whisper-macos-cli transcribe audio.ogg
 - [CONTRIBUTING.md](CONTRIBUTING.md) — How to contribute
 - [SECURITY.md](SECURITY.md) — Vulnerability policy
 - [INTEGRATIONS.md](INTEGRATIONS.md) — Integrations catalog
+- [PRIVACY.md](PRIVACY.md) — Data handling policy
 - [docs/HOW_TO_USE.md](docs/HOW_TO_USE.md) — Advanced recipes
 - [docs/AGENTS.md](docs/AGENTS.md) — Author guide for agent integrators
 - [docs/COOKBOOK.md](docs/COOKBOOK.md) — 20+ worked examples
 - [docs/CROSS_PLATFORM.md](docs/CROSS_PLATFORM.md) — Platform matrix
 - [docs/MIGRATION.md](docs/MIGRATION.md) — Version migration
 - [docs/TESTING.md](docs/TESTING.md) — Testing guide
+- [docs/VIDEO-EXTRACTION.md](docs/VIDEO-EXTRACTION.md) — Video and OGG/Opus fallback
 - [docs/schemas/](docs/schemas/README.md) — Machine-readable JSON schemas
 - [skill/](skill/) — Agent skill descriptors
 - [llms-full.txt](llms-full.txt) — Full reference

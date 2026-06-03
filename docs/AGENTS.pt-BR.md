@@ -8,6 +8,33 @@ Este documento é escrito para engenheiros que constroem agentes de IA
 que integram whisper-macos-cli como serviço de transcrição
 caixa-preta.
 
+## Por Que whisper-macos-cli para Agentes
+
+- A CLI é um único binário Rust com zero dependências de runtime
+  além do whisper.cpp e do stack Metal do macOS
+- Invocação por subprocess é a única superfície de integração,
+  com envelope JSON estável no stdout e convenção de exit code
+  sysexits.h
+- Toda saída carrega um `correlation_id` (UUID v7) e um
+  `schema_version`, habilitando fluxos de agentes rastreáveis e
+  evolução segura do contrato
+
+## Economia
+
+- 200 tokens de overhead por invocação (parsing do envelope)
+- 50 tokens por arquivo transcrito mais o comprimento do texto
+- 100 tokens de tratamento de erro por invocação falha
+- Sem re-embedding, sem hot-reload de modelo, sem custos de
+  warmup entre invocações quando `--concurrency` é constante
+
+## Soberania
+
+- Áudio e transcrições nunca saem do dispositivo
+- Sem telemetria, sem analytics, sem phone-home
+- Pesos do modelo são verificados por SHA256 antes do primeiro uso
+- Todo processamento acontece em macOS Apple Silicon controlado
+  pelo usuário
+
 ## Agentes e Orquestradores Compatíveis
 
 - Claude Code (Anthropic)

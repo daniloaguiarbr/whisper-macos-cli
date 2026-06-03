@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Documentation
+
+- Full bilingual documentation reviewed and validated against the
+  `rules_rust_documentation_framework`
+- Added `THIRD-PARTY-LICENSES.md` for crates.io publication
+- Added `MIGRATION.md` covering the 0.1.0 → 0.1.2 transition
+- Added video and ffmpeg Q&A to `FAQ.md`
+- Added video and ffmpeg recipes to `COOKBOOK.md`
+- Added ffmpeg subprocess sections to `SECURITY.md` and
+  `PRIVACY.md`
+- Added sections for the new error variants
+  `VideoExtractionFailed`, `FfmpegNotFound`, `UnsupportedVideoFormat`
+  to `TROUBLESHOOTING.md`
+- JSON schemas bumped to `$id` v0.1.2 with new `ffmpeg_binary`
+  and `no_ffmpeg_fallback` fields in `transcribe-input`
+- `Cargo.toml` migrated from `include` to `exclude` (inverted
+  allowlist per the framework)
+- Contributor Covenant badge added to `CODE_OF_CONDUCT.md`
+- All MCP references removed per project policy
+- `llms.txt` and `llms-full.txt` updated with `PRIVACY.md` and
+  `docs/VIDEO-EXTRACTION.md` links
+- `docs/AGENTS.md` hybrid AIDA structure added (Why/Economy/Sovereignty)
+
 ## [0.1.2] - 2026-06-02
 
 ### Added
@@ -51,113 +76,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   non-video files
 - Bounded timeout (180s default) prevents infinite hangs
 
-## [Unreleased]
+## [0.1.1] - 2026-06-02
 
 ### Changed
 
 - License changed from MIT-only to dual MIT OR Apache-2.0
 - `LICENSE-MIT` and `LICENSE-APACHE` replace the single `LICENSE` file
 - `Cargo.toml` license field is now `MIT OR Apache-2.0`
-- CI switched from `cargo test` to `cargo nextest` with `ci` profile
-- Codecov threshold raised from `1%` to `70%` with `fail_ci_if_error: true`
-- `cargo-deny` schema updated to v0.19 (new `notice`/`unmaintained` keys)
-- `Error` enum marked `#[non_exhaustive]` for SemVer stability
-- `map_to_whisper_code` exposed as `pub` for property testing
-
-### Added
-
-- SHA256 integrity verification on model downloads
-- User-Agent identification in HTTP requests
-- Retry with exponential backoff for transient download errors
-- Magic byte validation before audio decode
-- OGG/Opus pre-skip (3840 samples @ 48kHz) automatic discard
-- 24h maximum audio duration limit (DoS protection)
-- 2 GB maximum stdin size limit (OOM protection)
-- NFC normalization of transcription text
-- `correlation_id` (UUID v7) in every JSON output
-- `schema_version` field in every JSON output
-- `docs_url` field in error envelope
-- `retry_after_ms` field in error envelope
-- NDJSON summary line at end of batch operations
-- `slow-tests` feature gate for heavy audio integration test
-- `.config/nextest.toml` with `default`, `ci`, `heavy`, `quick` profiles
-- `benches/audio_benches.rs` with 10 criterion benchmarks
-- 9 new test files: `proptest_filters`, `proptest_vad`, `proptest_language`, `snapshots`, `wiremock_download`, `tempfile_storage`, `concurrent_shutdown`, `cli_subprocess` (9 inline snapshot files)
-- 6 new CI jobs: `geiger`, `feature-matrix`, `test` with `cargo-hack each-feature`
-- `RUST_BACKTRACE=1` enabled in CI for diagnostic
-- Doc test for `Error::to_json` envelope contract
-
-### Test Suite
-
-- 180 tests total: 99 unit + 81 integration
-- 0 tests ignored without `#[cfg_attr(feature = "slow-tests")]`
-- 70.77% line coverage, 79.41% function coverage (target 70%)
-- SIGINT handler with cleanup (no longer calls `process::exit`)
-- SIGTERM handler with graceful shutdown
-- Double-tap Ctrl+C forces immediate exit
-- New subcommands: `commands`, `init`, `licenses`, `config`, `resume`
-- New global flags: `--print-config`, `--print-schema`, `--no-input`
-- New transcribe flags: `--dry-run`, `--timeout`, `--retry-count`,
-  `--retry-max-elapsed`, `--offline`, `--resume`
-- `WHISPER_MODEL` and `WHISPER_LANGUAGE` environment variable support
-- `CI=true` environment variable honored
-- `doc-url` per error category
-- `air-gapped` detection in `doctor` subcommand
-- `disk space` check in `doctor` subcommand
-- Network connectivity probe in `doctor` subcommand
-- `THIRD-PARTY-LICENSES.md` and `THIRD-PARTY-LICENSES` subcommand
-- `CONTRIBUTING.md` with 8-item PR checklist
-- `SECURITY.md` with 72h SLA and coordinated disclosure policy
-- `CODE_OF_CONDUCT.md` (Contributor Covenant v2.1)
-- `PRIVACY.md` documenting data handling
-- `llms-full.txt` for comprehensive LLM consumption
-- `README.pt-BR.md` Brazilian Portuguese translation
-- `AGENTS.pt-BR.md` Brazilian Portuguese integration guide
-- `docs/HOW_TO_USE.md` (10+ advanced recipes)
-- `docs/COOKBOOK.md` (20+ worked examples)
-- `docs/INTEGRATIONS.md` (35+ integrations)
-- `docs/CROSS_PLATFORM.md` (platform support matrix)
-- `docs/TROUBLESHOOTING.md` (error solutions)
-- `docs/FAQ.md` (frequently asked questions)
-- `deny.toml` for cargo-deny license and advisory checks
-- `.cargo/audit.toml` for cargo-audit configuration
-- `.cargo/config.toml` for build reproducibility
-- `.editorconfig` for cross-editor consistency
-- `.gitattributes` for line ending normalization
-- `.github/workflows/ci.yml` with matrix, audit, deny, doc, coverage
-- `.github/workflows/release.yml` for cross-platform release builds
-- `.github/dependabot.yml` for automated dependency updates
-- `.github/ISSUE_TEMPLATE/bug.md` for structured bug reports
-- `.github/PULL_REQUEST_TEMPLATE.md` with 12-item checklist
-- `proptest` and `insta` dev dependencies
-- `criterion` benchmark scaffolding
-- `wiremock` for HTTP mock testing
-- `serial_test` for serial test execution
-
-### Changed
-
-- Model registry now stores `min_size_bytes` for partial-download
-  rejection
-- `error::Error::to_json` requires `correlation_id` parameter
-- All commands now propagate `correlation_id` through the call stack
-- `output::write_error` now requires `correlation_id` parameter
-- `signal::install_ctrlc_handler` renamed to `install_handlers`
-  and adds SIGTERM support
-- `eprintln!` replaced with `tracing::info!` in `transcribe.rs` and
-  `models.rs`
-- Transcription text normalized to Unicode NFC before serialization
-- Build requires Rust 1.88 MSRV
-
-### Security
-
-- Added `# Safety` documentation to all `unsafe` blocks
-- Added SHA256 verification on model download
-- Added User-Agent identification on all HTTP requests
-- Added `min_size_bytes` check to reject partial downloads
-- Added `cleanup_partial_downloads` to remove temp files on signal
-- Added explicit retry classification (5xx and 429 are transient)
-- Added 24h DoS protection limit on audio duration
-- Added 2 GB OOM protection on stdin size
 
 ## [0.1.0] - 2026-06-01
 
@@ -182,14 +107,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - BeamSearch decoding with configurable beam size (default 8)
 - Hallucination filtering and consecutive repeat collapsing
 - AGENTS.md, SKILL.md, llms.txt for LLM agent discovery
-
-## [0.1.1] - 2026-06-02
-
-### Changed
-
-- License changed from MIT-only to dual MIT OR Apache-2.0
-- `LICENSE-MIT` and `LICENSE-APACHE` replace the single `LICENSE` file
-- `Cargo.toml` license field is now `MIT OR Apache-2.0`
 
 [Unreleased]: https://github.com/daniloaguiarbr/whisper-macos-cli/compare/v0.1.2...HEAD
 [0.1.2]: https://github.com/daniloaguiarbr/whisper-macos-cli/compare/v0.1.1...v0.1.2
