@@ -9,6 +9,7 @@ use crate::cli::TranscribeArgs;
 use crate::error::Error;
 use crate::model::{download, registry, storage};
 use crate::output::{self, TranscriptionResult};
+use crate::video::ffmpeg::RealFfmpeg;
 use crate::whisper::{context, transcribe};
 
 const MAX_DURATION_SECONDS: f64 = 24.0 * 3600.0;
@@ -168,8 +169,9 @@ fn transcribe_source(
 ) -> Result<TranscriptionResult, Error> {
     let start = Instant::now();
 
+    let runner = RealFfmpeg::new(args.ffmpeg_binary.as_str());
     let pcm = match file_path {
-        Some(path) => decode::decode_file(path)?,
+        Some(path) => decode::decode_file_with_runner(path, &runner, !args.no_ffmpeg_fallback)?,
         None => decode::decode_stdin(args.input_format.as_deref())?,
     };
 

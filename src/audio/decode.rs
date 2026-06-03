@@ -8,6 +8,9 @@ use symphonia::core::io::MediaSourceStream;
 use symphonia::core::meta::MetadataOptions;
 use symphonia::core::probe::Hint;
 
+use crate::video::ffmpeg::{FfmpegRunner, RealFfmpeg, TempOutputGuard};
+use crate::video::is_video_magic_bytes;
+
 const OPUS_PRESKIP_SAMPLES: usize = 3840;
 const STDIN_MAX_BYTES: u64 = 2 * 1024 * 1024 * 1024;
 
@@ -27,6 +30,37 @@ impl PcmData {
 }
 
 pub fn decode_file(path: &Path) -> Result<PcmData, crate::error::Error> {
+    decode_file_inner(path, &RealFfmpeg::new("ffmpeg"), true)
+}
+
+/// Decode a file with optional ffmpeg fallback for unsupported audio
+/// formats (notably OGG/Opus from WhatsApp) and for video containers
+/// (MP4, MOV, MKV, AVI, WebM, M4V).
+///
+/// # Arguments
+///
+/// * `path` — input file path
+/// * `runner` — ffmpeg implementation (real or mock)
+/// * `auto_fallback` — if `true`, transparently use ffmpeg when the
+///   native decode fails or the input is a video container
+pub fn decode_file_with_runner(
+    path: &Path,
+    runner: &dyn FfmpegRunner,
+    auto_fallback: bool,
+) -> Result<PcmData, crate::error::Error> {
+    decode_file_inner(path, runner, auto_fallback)
+}
+
+/// Internal entry point that performs the actual decode logic.
+///
+/// Split from `decode_file` to avoid recursion when `decode_via_ffmpeg`
+/// calls back into this function with the temp WAV (which is a regular
+/// audio file, so auto_fallback MUST be disabled for the inner call).
+fn decode_file_inner(
+    path: &Path,
+    runner: &dyn FfmpegRunner,
+    auto_fallback: bool,
+) -> Result<PcmData, crate::error::Error> {
     let file = std::fs::File::open(path).map_err(|e| {
         if e.kind() == std::io::ErrorKind::NotFound {
             crate::error::Error::InputNotFound {
@@ -46,6 +80,27 @@ pub fn decode_file(path: &Path) -> Result<PcmData, crate::error::Error> {
         return Err(crate::error::Error::Io(e));
     }
 
+    // Branch 1: Video container detected by magic bytes — must extract
+    // audio via ffmpeg. We do this BEFORE attempting native decode
+    // because symphonia will misidentify the format.
+    if header_len >= 4 && is_video_magic_bytes(&header[..header_len]) {
+        if !auto_fallback {
+            return Err(crate::error::Error::UnsupportedVideoFormat {
+                format: path
+                    .extension()
+                    .and_then(|e| e.to_str())
+                    .unwrap_or("unknown")
+                    .to_string(),
+            });
+        }
+        tracing::info!(
+            path = %path.display(),
+            "video container detected, routing through ffmpeg"
+        );
+        return decode_via_ffmpeg(path, runner);
+    }
+
+    // Branch 2: OGG/Opus magic — try native first, then OGG fallback.
     if header_len >= 4 && is_ogg_opus_magic(&header[..header_len]) {
         return decode_ogg_opus(file);
     }
@@ -74,8 +129,47 @@ pub fn decode_file(path: &Path) -> Result<PcmData, crate::error::Error> {
             })?;
             decode_ogg_opus(file2)
         }
-        Err(e) => Err(e),
+        Err(e) => {
+            // Branch 3: Native decode failed for a non-OGG reason
+            // (symphonia bug with OGG/Opus from WhatsApp is a known
+            // issue). If the file looks like OGG/Opus, auto-fallback to
+            // ffmpeg, which handles the codec correctly.
+            if auto_fallback && is_ogg_opus_magic(&header[..header_len.min(4)]) {
+                return decode_via_ffmpeg(path, runner);
+            }
+            // Branch 4: Other formats — try ffmpeg as last resort
+            // (covers HLS, MPEG-TS, exotic MP3 variants, etc.)
+            if auto_fallback && runner.is_available() {
+                tracing::warn!(
+                    path = %path.display(),
+                    error = %e,
+                    "native decode failed, attempting ffmpeg fallback"
+                );
+                return decode_via_ffmpeg(path, runner);
+            }
+            Err(e)
+        }
     }
+}
+
+/// Extract audio from `input` to a temp WAV via ffmpeg, then decode the
+/// WAV with the native pipeline. The temp file is cleaned up via
+/// [`TempOutputGuard`].
+///
+/// # Recursion note
+///
+/// The inner call uses `auto_fallback=false` to prevent infinite
+/// recursion: the temp WAV is a normal audio file, not a video.
+fn decode_via_ffmpeg(
+    input: &Path,
+    runner: &dyn FfmpegRunner,
+) -> Result<PcmData, crate::error::Error> {
+    let result = runner.extract_audio_wav(input)?;
+    let wav_path = result.output_path;
+    let _guard = TempOutputGuard::new(wav_path.clone());
+    // The inner call MUST use auto_fallback=false to prevent recursion
+    // (the temp WAV is not a video and ffmpeg must not be called again).
+    decode_file_inner(&wav_path, runner, false)
 }
 
 pub fn decode_stdin(format_hint: Option<&str>) -> Result<PcmData, crate::error::Error> {

@@ -1,17 +1,19 @@
 ---
 name: whisper-macos-cli
-version: 0.1.0
-description: Transcribe audio files to text via whisper.cpp with Metal GPU on macOS Apple Silicon. Use when transcribing audio, processing voice messages, converting speech to text, batch-transcribing audio files, building AI agent transcription pipelines, or whenever local audio transcription is required without cloud services.
+version: 0.1.2
+description: Transcribe audio and video files to text via whisper.cpp with Metal GPU on macOS Apple Silicon. Use when transcribing audio, processing WhatsApp voice messages, transcribing video files, converting speech to text, batch-transcribing files, building AI agent transcription pipelines, or whenever local transcription is required without cloud services.
 invariants:
   - stdout is always valid JSON or NDJSON
   - stderr is always human-readable logs
   - exit codes follow sysexits.h convention
   - large-v3 model is the default
-  - OGG/Opus (WhatsApp voice messages) is supported natively
+  - OGG/Opus (WhatsApp voice messages) is supported natively with automatic ffmpeg fallback
+  - video is extracted to WAV via ffmpeg subprocess before transcription
 triggers:
   - transcribe audio
   - speech to text
   - audio transcription
+  - video transcription
   - whisper.cpp
   - voice message transcription
   - whatsapp audio
@@ -23,9 +25,16 @@ triggers:
 
 ## Capability
 
-Local audio transcription via whisper.cpp with Metal GPU acceleration
-on macOS Apple Silicon. Accepts MP3, OGG/Vorbis, OGG/Opus (WhatsApp),
-FLAC, WAV, AAC. Emits JSON on stdout with transcription text.
+Local audio and video transcription via whisper.cpp with Metal GPU
+acceleration on macOS Apple Silicon. Accepts audio (MP3, OGG/Vorbis,
+OGG/Opus/WhatsApp, FLAC, WAV, AAC) and video (MP4, MOV, M4V, MKV,
+WebM, AVI). Video is extracted to WAV via ffmpeg subprocess before
+transcription. Emits JSON on stdout with transcription text.
+
+### Video Requirements
+
+- ffmpeg 4.0+ must be available on PATH (or via `--ffmpeg-binary`)
+- Install with `brew install ffmpeg` on macOS
 
 ## Installation
 
@@ -56,14 +65,20 @@ cargo install whisper-macos-cli
 ### Correct Pattern
 
 ```bash
-# Single file
+# Single audio file
 whisper-macos-cli transcribe voice.ogg
 
-# From stdin
+# Video (automatic audio extraction via ffmpeg)
+whisper-macos-cli transcribe video.mp4
+
+# Mixed batch with NDJSON
+whisper-macos-cli transcribe *.ogg *.mp4 --ndjson --concurrency 4
+
+# From stdin (audio only)
 cat audio.mp3 | whisper-macos-cli transcribe
 
-# Batch with NDJSON
-whisper-macos-cli transcribe *.ogg --ndjson --concurrency 4
+# Custom ffmpeg binary
+whisper-macos-cli transcribe --ffmpeg-binary /opt/local/bin/ffmpeg video.mov
 ```
 
 ## JSON Contract
@@ -110,20 +125,33 @@ Every output on stdout MUST be a valid JSON object with at minimum:
 
 ## Exit Codes
 
-| Code | Meaning                | Retryable |
-|------|------------------------|-----------|
-| 0    | Success                | n/a       |
-| 2    | Usage error            | no        |
-| 64   | No input provided      | no        |
-| 65   | Invalid audio data      | no        |
-| 66   | Input file not found    | no        |
-| 69   | Service unavailable    | yes       |
-| 70   | Inference error         | no        |
-| 74   | I/O error               | no        |
-| 78   | Configuration error     | no        |
-| 130  | SIGINT (Ctrl+C)         | no        |
-| 141  | Broken pipe             | no        |
-| 143  | SIGTERM                 | no        |
+| Code | Meaning                                  | Retryable |
+|------|------------------------------------------|-----------|
+| 0    | Success                                  | n/a       |
+| 2    | Usage error                              | no        |
+| 64   | No input provided                        | no        |
+| 65   | Invalid audio/video data                 | no        |
+| 66   | Input file not found                     | no        |
+| 69   | Service unavailable (ffmpeg missing)     | yes       |
+| 70   | Inference error                          | no        |
+| 74   | I/O error                                | no        |
+| 78   | Configuration error                      | no        |
+| 130  | SIGINT (Ctrl+C)                          | no        |
+| 141  | Broken pipe                              | no        |
+| 143  | SIGTERM                                  | no        |
+
+## Video and OGG/Opus Auto-Fallback
+
+Since v0.1.2, video files (MP4, MOV, MKV, WebM, AVI) are supported
+automatically: audio is extracted via ffmpeg subprocess to a temp
+WAV then transcribed. Requires ffmpeg 4.0+ on PATH.
+
+WhatsApp OGG/Opus audio that fails the native symphonia decoder
+(upstream codec status "In work") is automatically routed via ffmpeg
+as a transparent fallback. No explicit flag required.
+
+Use `--no-ffmpeg-fallback` to disable the fallback (useful for
+reproducing native decoder bugs).
 
 ## FORBIDDEN
 

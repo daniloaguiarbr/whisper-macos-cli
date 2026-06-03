@@ -15,6 +15,15 @@ pub enum Error {
     #[error("unsupported audio format: {format}")]
     UnsupportedFormat { format: String },
 
+    #[error("video extraction failed: {path}: {ffmpeg_stderr}")]
+    VideoExtractionFailed { path: String, ffmpeg_stderr: String },
+
+    #[error("ffmpeg not found in PATH: install via `brew install ffmpeg` or set --ffmpeg-binary")]
+    FfmpegNotFound,
+
+    #[error("unsupported video format: {format}")]
+    UnsupportedVideoFormat { format: String },
+
     #[error("model not found: {name}")]
     ModelNotFound { name: String },
 
@@ -41,6 +50,9 @@ impl Error {
             Self::InputNotFound { .. } => 66,
             Self::AudioDecode(_) => 65,
             Self::UnsupportedFormat { .. } => 65,
+            Self::VideoExtractionFailed { .. } => 65,
+            Self::FfmpegNotFound => 69,
+            Self::UnsupportedVideoFormat { .. } => 65,
             Self::ModelNotFound { .. } => 78,
             Self::ModelDownload(_) => 69,
             Self::WhisperInference(_) => 70,
@@ -58,7 +70,11 @@ impl Error {
         match self {
             Self::NoInput => "usage",
             Self::InputNotFound { .. } => "input",
-            Self::AudioDecode(_) | Self::UnsupportedFormat { .. } => "data",
+            Self::AudioDecode(_)
+            | Self::UnsupportedFormat { .. }
+            | Self::VideoExtractionFailed { .. }
+            | Self::UnsupportedVideoFormat { .. } => "data",
+            Self::FfmpegNotFound => "service",
             Self::ModelNotFound { .. } | Self::Config(_) => "config",
             Self::ModelDownload(_) | Self::UnsupportedPlatform => "service",
             Self::WhisperInference(_) => "internal",
@@ -85,6 +101,13 @@ impl Error {
                 Some("verify the file is a valid audio format (ogg, mp3, wav, flac)")
             }
             Self::UnsupportedFormat { .. } => Some("use --input-format to force a specific codec"),
+            Self::VideoExtractionFailed { .. } => {
+                Some("ffmpeg failed to extract audio; check codec and --ffmpeg-binary")
+            }
+            Self::FfmpegNotFound => {
+                Some("install ffmpeg via `brew install ffmpeg` or set --ffmpeg-binary")
+            }
+            Self::UnsupportedVideoFormat { .. } => Some("supported: mp4, mov, m4v, mkv, webm, avi"),
             Self::ModelNotFound { .. } => {
                 Some("run 'whisper-macos-cli models list' to see available models")
             }
@@ -109,6 +132,15 @@ impl Error {
             }
             Self::UnsupportedFormat { .. } => {
                 "https://github.com/daniloaguiarbr/whisper-macos-cli/blob/main/docs/TROUBLESHOOTING.md#unsupported-format"
+            }
+            Self::VideoExtractionFailed { .. } => {
+                "https://github.com/daniloaguiarbr/whisper-macos-cli/blob/main/docs/VIDEO-EXTRACTION.md"
+            }
+            Self::FfmpegNotFound => {
+                "https://github.com/daniloaguiarbr/whisper-macos-cli/blob/main/docs/VIDEO-EXTRACTION.md#ffmpeg-not-found"
+            }
+            Self::UnsupportedVideoFormat { .. } => {
+                "https://github.com/daniloaguiarbr/whisper-macos-cli/blob/main/docs/VIDEO-EXTRACTION.md#supported-formats"
             }
             Self::ModelNotFound { .. } => {
                 "https://github.com/daniloaguiarbr/whisper-macos-cli/blob/main/AGENTS.md#model-management"
@@ -311,5 +343,58 @@ mod tests {
         assert_eq!(Error::WhisperInference("x".into()).exit_code(), 70);
         assert_eq!(Error::UnsupportedPlatform.exit_code(), 69);
         assert_eq!(Error::Config("x".into()).exit_code(), 78);
+    }
+
+    #[test]
+    fn video_extraction_failed_exit_code_is_65() {
+        let err = Error::VideoExtractionFailed {
+            path: "video.mp4".into(),
+            ffmpeg_stderr: "Invalid data found".into(),
+        };
+        assert_eq!(err.exit_code(), 65);
+        assert_eq!(err.category(), "data");
+        assert!(!err.retryable());
+    }
+
+    #[test]
+    fn ffmpeg_not_found_exit_code_is_69() {
+        assert_eq!(Error::FfmpegNotFound.exit_code(), 69);
+        assert_eq!(Error::FfmpegNotFound.category(), "service");
+        assert!(!Error::FfmpegNotFound.retryable());
+        assert!(
+            Error::FfmpegNotFound
+                .hint()
+                .unwrap()
+                .contains("brew install ffmpeg")
+        );
+    }
+
+    #[test]
+    fn unsupported_video_format_exit_code_is_65() {
+        let err = Error::UnsupportedVideoFormat {
+            format: "wmv".into(),
+        };
+        assert_eq!(err.exit_code(), 65);
+        assert_eq!(err.category(), "data");
+        assert!(err.hint().unwrap().contains("mp4"));
+    }
+
+    #[test]
+    fn video_errors_have_video_docs_url() {
+        let err = Error::VideoExtractionFailed {
+            path: "x".into(),
+            ffmpeg_stderr: "y".into(),
+        };
+        assert!(err.docs_url().contains("VIDEO-EXTRACTION"));
+        assert!(
+            Error::FfmpegNotFound
+                .docs_url()
+                .contains("VIDEO-EXTRACTION")
+        );
+        assert!(
+            Error::UnsupportedVideoFormat { format: "x".into() }
+                .docs_url()
+                .contains("VIDEO-EXTRACTION")
+        );
     }
 }

@@ -68,3 +68,29 @@ fn snapshot_unsupported_format_envelope() {
     let json = err.to_json("88888888-8888-8888-8888-888888888888");
     insta::assert_json_snapshot!("error_unsupported_format", json);
 }
+
+#[test]
+fn snapshot_video_extraction_failed_envelope() {
+    let err = Error::VideoExtractionFailed {
+        path: "video.mp4".to_string(),
+        ffmpeg_stderr: "Invalid data found when processing input".to_string(),
+    };
+    let json = err.to_json("99999999-9999-9999-9999-999999999999");
+    insta::assert_json_snapshot!("error_video_extraction_failed", json);
+}
+
+#[test]
+fn snapshot_ffmpeg_not_found_envelope() {
+    let err = Error::FfmpegNotFound;
+    let json = err.to_json("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
+    insta::assert_json_snapshot!("error_ffmpeg_not_found", json);
+}
+
+#[test]
+fn snapshot_unsupported_video_format_envelope() {
+    let err = Error::UnsupportedVideoFormat {
+        format: "wmv".to_string(),
+    };
+    let json = err.to_json("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
+    insta::assert_json_snapshot!("error_unsupported_video_format", json);
+}

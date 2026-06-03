@@ -1,0 +1,16 @@
+---
+source: tests/snapshots.rs
+expression: json
+---
+{
+  "schema_version": "0.1.2",
+  "error": true,
+  "code": 65,
+  "message": "video extraction failed: video.mp4: Invalid data found when processing input",
+  "category": "data",
+  "retryable": false,
+  "retry_after_ms": null,
+  "hint": "ffmpeg failed to extract audio; check codec and --ffmpeg-binary",
+  "docs_url": "https://github.com/daniloaguiarbr/whisper-macos-cli/blob/main/docs/VIDEO-EXTRACTION.md",
+  "correlation_id": "99999999-9999-9999-9999-999999999999"
+}

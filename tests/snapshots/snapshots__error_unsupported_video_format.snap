@@ -1,0 +1,16 @@
+---
+source: tests/snapshots.rs
+expression: json
+---
+{
+  "schema_version": "0.1.2",
+  "error": true,
+  "code": 65,
+  "message": "unsupported video format: wmv",
+  "category": "data",
+  "retryable": false,
+  "retry_after_ms": null,
+  "hint": "supported: mp4, mov, m4v, mkv, webm, avi",
+  "docs_url": "https://github.com/daniloaguiarbr/whisper-macos-cli/blob/main/docs/VIDEO-EXTRACTION.md#supported-formats",
+  "correlation_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
+}

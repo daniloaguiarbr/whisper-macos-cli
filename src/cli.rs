@@ -210,6 +210,20 @@ pub struct TranscribeArgs {
     #[arg(long, value_name = "FMT", help_heading = "Input")]
     pub input_format: Option<String>,
 
+    /// Path to ffmpeg binary (auto-detected from PATH by default)
+    #[arg(
+        long,
+        value_name = "PATH",
+        env = "WHISPER_FFMPEG_BINARY",
+        default_value = "ffmpeg",
+        help_heading = "Input"
+    )]
+    pub ffmpeg_binary: String,
+
+    /// Disable automatic ffmpeg fallback (e.g. for reproducing bugs)
+    #[arg(long, env = "WHISPER_NO_FFMPEG_FALLBACK", help_heading = "Input")]
+    pub no_ffmpeg_fallback: bool,
+
     /// Resolve inputs and exit without transcribing
     #[arg(long, help_heading = "Execution")]
     pub dry_run: bool,

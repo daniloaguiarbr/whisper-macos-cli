@@ -1,0 +1,16 @@
+---
+source: tests/snapshots.rs
+expression: json
+---
+{
+  "schema_version": "0.1.2",
+  "error": true,
+  "code": 69,
+  "message": "ffmpeg not found in PATH: install via `brew install ffmpeg` or set --ffmpeg-binary",
+  "category": "service",
+  "retryable": false,
+  "retry_after_ms": null,
+  "hint": "install ffmpeg via `brew install ffmpeg` or set --ffmpeg-binary",
+  "docs_url": "https://github.com/daniloaguiarbr/whisper-macos-cli/blob/main/docs/VIDEO-EXTRACTION.md#ffmpeg-not-found",
+  "correlation_id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+}

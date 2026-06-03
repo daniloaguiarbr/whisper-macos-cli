@@ -5,6 +5,52 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2026-06-02
+
+### Added
+
+- Video container support: MP4, MOV, M4V, MKV, WebM, AVI, M4A
+- Auto-extraction of audio track from video via ffmpeg subprocess
+- `Error::VideoExtractionFailed` (exit 65) when ffmpeg fails
+- `Error::FfmpegNotFound` (exit 69) when ffmpeg binary is missing
+- `Error::UnsupportedVideoFormat` (exit 65) when `--no-ffmpeg-fallback` is set
+- `--ffmpeg-binary <PATH>` flag (env: `WHISPER_FFMPEG_BINARY`)
+- `--no-ffmpeg-fallback` flag (env: `WHISPER_NO_FFMPEG_FALLBACK`) to opt out
+- `docs/VIDEO-EXTRACTION.md` (English) and `docs/VIDEO-EXTRACTION.pt-BR.md` (PT-BR)
+- ffmpeg subprocess wrapper with `FfmpegRunner` trait, `RealFfmpeg` and `MockFfmpeg`
+- 17 unit tests in `src/video/mod.rs` for magic bytes detection
+- 23 unit tests in `src/video/ffmpeg.rs` for subprocess hardening
+- 12 integration tests in `tests/video_extraction.rs` covering routing logic
+
+### Fixed
+
+- OGG/Opus decode failure for WhatsApp voice messages (symphonia Issue #8):
+  transparent fallback to ffmpeg when native decode fails, with full
+  error capture and bounded timeout
+
+### Changed
+
+- `decode_file` now takes optional ffmpeg runner and auto-fallback flag
+- Default behavior: ffmpeg fallback is enabled but only triggers on
+  actual decode failure, not on success
+- `Error` enum marked `#[non_exhaustive]` for stable evolution
+- `Error::VideoExtractionFailed` field renamed from `source` to `path`
+  to avoid conflict with `thiserror` `source` semantics
+
+### Security
+
+- ffmpeg subprocess runs with `env_clear()` plus minimal allowlist
+  (`PATH`, `HOME`, `TMPDIR`, `LANG`, `LC_ALL`) to prevent secret leaks
+- Child process wrapped in `SafeChild` with kill-on-drop semantics;
+  no zombie ffmpeg processes on panic
+- Unix: child runs in own process group via `setsid()` so SIGINT to
+  parent does not cascade
+- Windows: `CREATE_NEW_PROCESS_GROUP` for same isolation
+- Temp WAV files cleaned up via `Drop` guard even on panic
+- Magic bytes validated BEFORE ffmpeg invocation to refuse renamed
+  non-video files
+- Bounded timeout (180s default) prevents infinite hangs
+
 ## [Unreleased]
 
 ### Changed

@@ -3,7 +3,7 @@ source: tests/snapshots.rs
 expression: json
 ---
 {
-  "schema_version": "0.1.1",
+  "schema_version": "0.1.2",
   "error": true,
   "code": 69,
   "message": "model download failed: HTTP 503 Service Unavailable",

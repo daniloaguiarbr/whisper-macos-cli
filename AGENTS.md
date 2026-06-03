@@ -53,7 +53,13 @@ need to invoke whisper-macos-cli as a black-box transcription service.
 # 30-second setup
 cargo install whisper-macos-cli
 whisper-macos-cli models download
+
+# Transcribe audio
 whisper-macos-cli transcribe voice.ogg
+
+# Transcribe video (requires ffmpeg)
+brew install ffmpeg
+whisper-macos-cli transcribe video.mp4
 ```
 
 ## Token Budget
@@ -64,20 +70,36 @@ whisper-macos-cli transcribe voice.ogg
 
 ## Exit Codes
 
-| Code | Meaning                | Retryable |
-|------|------------------------|-----------|
-| 0    | Success                | n/a       |
-| 2    | Usage error            | no        |
-| 64   | No input provided      | no        |
-| 65   | Invalid audio data      | no        |
-| 66   | Input file not found    | no        |
-| 69   | Service unavailable    | yes       |
-| 70   | Inference error         | no        |
-| 74   | I/O error               | no        |
-| 78   | Configuration error     | no        |
-| 130  | SIGINT (Ctrl+C)         | no        |
-| 141  | Broken pipe             | no        |
-| 143  | SIGTERM                 | no        |
+| Code | Meaning                                  | Retryable |
+|------|------------------------------------------|-----------|
+| 0    | Success                                  | n/a       |
+| 2    | Usage error                              | no        |
+| 64   | No input provided                        | no        |
+| 65   | Invalid audio/video data                 | no        |
+| 66   | Input file not found                     | no        |
+| 69   | Service unavailable (ffmpeg missing)     | yes       |
+| 70   | Inference error                          | no        |
+| 74   | I/O error                                | no        |
+| 78   | Configuration error                      | no        |
+| 130  | SIGINT (Ctrl+C)                          | no        |
+| 141  | Broken pipe                              | no        |
+| 143  | SIGTERM                                  | no        |
+
+## Video Transcription (v0.1.2+)
+
+Since v0.1.2, whisper-macos-cli supports video containers
+(MP4, MOV, M4V, MKV, WebM, AVI) by extracting the audio track
+via ffmpeg subprocess. Requires ffmpeg 4.0+ on PATH.
+
+```bash
+whisper-macos-cli transcribe video.mp4
+```
+
+OGG/Opus WhatsApp audio that fails the native decoder is
+automatically re-routed via ffmpeg as a transparent fallback.
+
+See [docs/VIDEO-EXTRACTION.md](docs/VIDEO-EXTRACTION.md) for full
+details.
 
 ## Subcommands for Agent Discovery
 

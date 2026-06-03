@@ -6,6 +6,7 @@ pub mod language;
 pub mod model;
 pub mod output;
 pub mod signal;
+pub mod video;
 pub mod whisper;
 
 use std::io::Write;
