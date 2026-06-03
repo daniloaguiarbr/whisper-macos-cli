@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/daniloaguiarbr/whisper-macos-cli/schemas/transcribe-input/v0.1.0.json",
+  "$id": "https://github.com/daniloaguiarbr/whisper-macos-cli/schemas/transcribe-input/v0.1.2.json",
   "title": "TranscribeInput",
   "type": "object",
   "description": "CLI flags accepted by the transcribe subcommand. The CLI itself uses clap derive; this schema is the machine-readable mirror for agent integrators.",
@@ -53,6 +53,16 @@
     "input_format": {
       "type": "string",
       "enum": ["ogg", "mp3", "wav", "flac", "aac", "opus"]
+    },
+    "ffmpeg_binary": {
+      "type": "string",
+      "default": "ffmpeg",
+      "description": "Path to the ffmpeg binary used to extract audio from video containers and to fall back when native OGG/Opus decoding fails. Resolved from --ffmpeg-binary flag or WHISPER_FFMPEG_BINARY environment variable."
+    },
+    "no_ffmpeg_fallback": {
+      "type": "boolean",
+      "default": false,
+      "description": "Disable the transparent ffmpeg fallback. When true, OGG/Opus decode failures propagate as errors and video files are rejected with Error::UnsupportedVideoFormat (exit 65). Useful for reproducing native decoder bugs."
     },
     "dry_run": {
       "type": "boolean",

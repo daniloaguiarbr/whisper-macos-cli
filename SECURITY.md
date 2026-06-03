@@ -53,6 +53,47 @@ Silicon. It is NOT designed to:
 - Run as root or with elevated privileges
 - Operate in a multi-tenant environment
 
+## ffmpeg Subprocess Isolation (v0.1.2+)
+
+Since v0.1.2, the CLI may invoke `ffmpeg` as a subprocess to
+extract audio from video containers and to fall back when native
+OGG/Opus decoding fails. The subprocess is invoked with the
+following hardening guarantees:
+
+- env_clear: the child process inherits no environment variables
+  from the parent. Only an explicit allowlist of `PATH`, `HOME`,
+  `TMPDIR`, `LANG`, `LC_ALL` is added back. This prevents
+  accidental leakage of secrets via ffmpeg error logs.
+- setsid (Unix) / CREATE_NEW_PROCESS_GROUP (Windows): the child
+  runs in its own process group. SIGINT delivered to the parent
+  CLI does not silently propagate to ffmpeg, allowing the parent
+  to perform graceful shutdown while leaving the child to its
+  own lifecycle.
+- Kill-on-drop: the child handle is wrapped in a SafeChild
+  guard with a Drop implementation that sends SIGKILL (Unix) or
+  TerminateProcess (Windows) on parent panic. This prevents
+  zombie ffmpeg processes.
+- Bounded timeout: a default 180s timeout per invocation. On
+  timeout, the child is killed and `Error::VideoExtractionFailed`
+  is returned.
+- WAV output validation: the extracted WAV is validated
+  post-process. The header must be `RIFF...WAVE` and the chunk
+  size must match the file size minus 8. This catches the class
+  of bugs where ffmpeg exits 0 but produces an empty or truncated
+  file.
+- Temp cleanup: the temp WAV file is removed via a Drop guard
+  even if decode panics or the process is interrupted.
+- Magic bytes validation BEFORE ffmpeg invocation: the input
+  file is sniffed for video container magic bytes before ffmpeg
+  is invoked. This refuses to invoke ffmpeg on renamed
+  non-video files.
+
+The subprocess is invoked via `std::process::Command` with
+`env_clear()` and `pre_exec` (Unix) or `creation_flags`
+(Windows). The child is NOT linked into the binary. ffmpeg must
+be installed separately; if it is not, the CLI returns exit
+code 69 with a clear install hint.
+
 ## Known Limitations
 
 - The 3GB Whisper model is loaded entirely into unified memory
@@ -60,6 +101,11 @@ Silicon. It is NOT designed to:
 - Hash-based deduplication is not performed across invocations
 - Audio is held in memory during transcription; large files increase
   peak memory consumption
+- ffmpeg is an external binary, not bundled. Behavior depends on
+  the user-installed version of ffmpeg
+- Temp WAV files are written to the system temp directory; users
+  with restricted temp directories may need to override via
+  `TMPDIR` environment variable
 
 ## Cryptography
 

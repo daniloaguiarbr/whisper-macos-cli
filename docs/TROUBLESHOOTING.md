@@ -20,6 +20,17 @@ The audio file is corrupt, encrypted, or uses an unsupported codec.
 Fix: verify the file plays in a media player, then re-export it as
 uncompressed WAV or standard OGG/Opus.
 
+For video files, exit code 65 also covers:
+
+- `Error::VideoExtractionFailed` — ffmpeg subprocess failed
+  (timeout, OOM, invalid video stream, etc.)
+- `Error::UnsupportedVideoFormat` — the input is a video file
+  but `--no-ffmpeg-fallback` is set
+
+Fix: install ffmpeg (`brew install ffmpeg`) and retry without
+`--no-ffmpeg-fallback`. See [VIDEO-EXTRACTION.md](VIDEO-EXTRACTION.md)
+for details.
+
 ## exit code 66 — input file not found
 
 The path you provided does not exist or is not readable.
@@ -28,14 +39,21 @@ Fix: check the path. Use `ls` to verify the file is present.
 
 ## exit code 69 — service unavailable
 
-Either the model download failed or you are on an unsupported
-platform.
+Either the model download failed, you are on an unsupported
+platform, or ffmpeg is not installed and the input is a video
+file (or the native OGG/Opus decode failed and the fallback
+needs ffmpeg).
 
 Fix:
 
 1. Run `whisper-macos-cli doctor` to see what's wrong
 2. Check your network connection
 3. Verify you are on macOS with Apple Silicon
+4. For video files: install ffmpeg via `brew install ffmpeg`
+5. For OGG/Opus fallback: install ffmpeg and remove
+   `--no-ffmpeg-fallback` if present
+6. Use `--ffmpeg-binary <PATH>` if ffmpeg is installed but not
+   on PATH
 
 ## exit code 70 — whisper inference failed
 

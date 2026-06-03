@@ -36,6 +36,28 @@ Whisper no primeiro uso. Cada requisição inclui:
 Sem cookies, sem pixels de rastreamento, sem analytics, sem
 telemetria.
 
+## Subprocesso e Arquivos Temporários (v0.1.2+)
+
+Desde a v0.1.2, a CLI pode invocar `ffmpeg` como subprocesso
+para extrair áudio de containers de vídeo. Os seguintes
+comportamentos se aplicam:
+
+- O subprocesso é invocado com `env_clear()` mais allowlist
+  explícita de `PATH`, `HOME`, `TMPDIR`, `LANG`, `LC_ALL`. O
+  processo filho não recebe nenhuma outra variável de ambiente
+  do pai.
+- Um arquivo WAV temporário é criado no diretório temp do
+  sistema (resolvido de `TMPDIR` ou `std::env::temp_dir()`). O
+  arquivo temp é removido via guard `Drop` mesmo se o processo
+  for interrompido ou entrar em panic.
+- O arquivo temp contém dados de áudio PCM descompactados
+  derivados do input fornecido pelo usuário. O conteúdo de
+  áudio é o mesmo do input; o arquivo não é transmitido para
+  nenhum serviço externo.
+- ffmpeg é um binário externo, não empacotado com
+  whisper-macos-cli. O comportamento depende da versão do
+  ffmpeg instalada pelo usuário.
+
 ## O Que NÃO É Coletado
 
 - Sem analytics de uso

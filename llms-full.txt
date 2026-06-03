@@ -164,7 +164,7 @@ whisper-macos-cli transcribe audio.ogg
 
 - AGENTS.md: Integration guide for AI agents
 - AGENTS.pt-BR.md: Brazilian Portuguese integration guide
-- SKILL.md: MCP/agent skill descriptor
+- SKILL.md: agent skill descriptor
 - README.md: Project overview
 - README.pt-BR.md: Brazilian Portuguese overview
 - docs/HOW_TO_USE.md: Advanced recipes

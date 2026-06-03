@@ -12,46 +12,26 @@ keywords = ["whisper", "transcription", "macos", "audio", "ai-agents"]
 categories = ["command-line-utilities", "multimedia::audio", "api-bindings"]
 readme = "README.md"
 documentation = "https://docs.rs/whisper-macos-cli"
-include = [
-    "src/**/*.rs",
-    "tests/**/*.rs",
-    "build.rs",
-    "Cargo.toml",
-    "Cargo.lock",
-    "README.md",
-    "README.pt-BR.md",
-    "CHANGELOG.md",
-    "CHANGELOG.pt-BR.md",
-    "CONTRIBUTING.md",
-    "CONTRIBUTING.pt-BR.md",
-    "CODE_OF_CONDUCT.md",
-    "CODE_OF_CONDUCT.pt-BR.md",
-    "SECURITY.md",
-    "SECURITY.pt-BR.md",
-    "INTEGRATIONS.md",
-    "INTEGRATIONS.pt-BR.md",
-    "PRIVACY.md",
-    "PRIVACY.pt-BR.md",
-    "LICENSE-MIT",
-    "LICENSE-APACHE",
-    "NOTICE",
-    "AGENTS.md",
-    "AGENTS.pt-BR.md",
-    "SKILL.md",
-    "llms.txt",
-    "llms.pt-BR.txt",
-    "llms-full.txt",
-    "deny.toml",
-    ".editorconfig",
-    "docs/**/*",
-    "skill/**/*",
-    "THIRD-PARTY-LICENSES.md",
+exclude = [
+    "/.git",
+    "/.github",
+    "/.gitignore",
+    "/.gitattributes",
+    "/.vscode",
+    "/.idea",
+    "/.claude",
+    "/.opencode",
+    "/.serena",
+    "/target",
+    "**/.DS_Store",
+    "/lcov.info",
+    "/tests/proptest-regressions/**",
+    "/benches/target",
 ]
 
 [features]
 default = ["metal"]
 metal = []
-mcp = []
 slow-tests = []
 
 [dependencies]

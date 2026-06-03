@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/daniloaguiarbr/whisper-macos-cli/schemas/schema-envelope/v0.1.0.json",
+  "$id": "https://github.com/daniloaguiarbr/whisper-macos-cli/schemas/schema-envelope/v0.1.2.json",
   "title": "SchemaEnvelope",
   "description": "Self-describing envelope emitted by whisper-macos-cli schema",
   "type": "object",

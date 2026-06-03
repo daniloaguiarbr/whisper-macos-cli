@@ -54,9 +54,27 @@ ecosystem crates that compose the binary are documented in
 
 - Input: file path or stdin
 - Output: JSON envelope on stdout
-- Side effects: may write to model cache directory
+- Side effects: may write to model cache directory; may invoke
+  ffmpeg subprocess for video or OGG/Opus fallback
 - Idempotent: yes (same input, same model, same output)
 - Checkpointable: no
+- Supported formats (v0.1.2+): MP3, WAV, FLAC, AAC, OGG/Vorbis,
+  OGG/Opus, MP4, MOV, M4V, MKV, WebM, AVI, FLV, WMV/WMA
+
+### Read (transcribe video, v0.1.2+)
+
+- Input: video file path (MP4, MOV, M4V, MKV, WebM, AVI)
+- Output: JSON envelope on stdout (same as audio transcribe)
+- Side effects: spawns ffmpeg subprocess; writes temp WAV to
+  `$TMPDIR`; writes to model cache directory
+- Idempotent: yes
+- Requires: ffmpeg 4.0+ on PATH or via `--ffmpeg-binary`
+- New error variants: `VideoExtractionFailed` (exit 65),
+  `FfmpegNotFound` (exit 69), `UnsupportedVideoFormat` (exit 65)
+- New CLI flags: `--ffmpeg-binary <PATH>`,
+  `--no-ffmpeg-fallback`
+- New env vars: `WHISPER_FFMPEG_BINARY`,
+  `WHISPER_NO_FFMPEG_FALLBACK`
 
 ### Discovery
 
@@ -126,9 +144,9 @@ with the contract, examples, and exit codes.
 | 0    | Success                | n/a       |
 | 2    | Usage error            | no        |
 | 64   | No input provided      | no        |
-| 65   | Invalid audio data      | no        |
+| 65   | Invalid audio or video data, video extraction failed, unsupported video format | no |
 | 66   | Input file not found    | no        |
-| 69   | Service unavailable    | yes       |
+| 69   | Service unavailable (ffmpeg missing or download failed) | yes |
 | 70   | Inference error         | no        |
 | 74   | I/O error               | no        |
 | 78   | Configuration error     | no        |

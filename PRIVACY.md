@@ -33,6 +33,26 @@ models on first use. Each request includes:
 
 No cookies, no tracking pixels, no analytics, no telemetry.
 
+## Subprocess and Temporary Files (v0.1.2+)
+
+Since v0.1.2, the CLI may invoke `ffmpeg` as a subprocess to
+extract audio from video containers. The following behaviors apply:
+
+- The subprocess is invoked with `env_clear()` plus an explicit
+  allowlist of `PATH`, `HOME`, `TMPDIR`, `LANG`, `LC_ALL`. The
+  child process does not receive any other environment variables
+  from the parent.
+- A temporary WAV file is created in the system temp directory
+  (resolved from `TMPDIR` or `std::env::temp_dir()`). The temp
+  file is removed via a `Drop` guard even if the process is
+  interrupted or panics.
+- The temp file contains uncompressed PCM audio data derived
+  from the user-supplied input. The audio content is the same
+  as the input; the file is not transmitted to any external
+  service.
+- ffmpeg is an external binary, not bundled with whisper-macos-cli.
+  Behavior depends on the user-installed version of ffmpeg.
+
 ## What Is NOT Collected
 
 - No usage analytics

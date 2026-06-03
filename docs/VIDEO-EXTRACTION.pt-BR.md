@@ -1,3 +1,5 @@
+[English version](VIDEO-EXTRACTION.md) | [Versão em Português Brasileiro](VIDEO-EXTRACTION.pt-BR.md)
+
 # Extração de Vídeo — whisper-macos-cli v0.1.2+
 
 Desde a v0.1.2, o whisper-macos-cli consegue transcrever áudio a
@@ -24,16 +26,16 @@ Arquivos renomeados (`.ogg` com magic MP4) são roteados corretamente.
 
 ## Requisitos
 
-- **ffmpeg 4.0 ou superior** deve estar instalado e acessível no
-  `PATH`, ou sua localização deve ser especificada via
-  `--ffmpeg-binary` ou a variável de ambiente `WHISPER_FFMPEG_BINARY`.
+- ffmpeg 4.0 ou superior deve estar instalado e acessível no PATH,
+  ou sua localização deve ser especificada via `--ffmpeg-binary` ou
+  a variável de ambiente `WHISPER_FFMPEG_BINARY`.
 
 ### Instalar o ffmpeg
 
-- **macOS:** `brew install ffmpeg`
-- **Ubuntu/Debian:** `sudo apt-get install ffmpeg`
-- **Windows (Chocolatey):** `choco install ffmpeg`
-- **Windows (winget):** `winget install Gyan.FFmpeg`
+- macOS: `brew install ffmpeg`
+- Ubuntu/Debian: `sudo apt-get install ffmpeg`
+- Windows (Chocolatey): `choco install ffmpeg`
+- Windows (winget): `winget install Gyan.FFmpeg`
 
 ## Uso
 
@@ -77,19 +79,19 @@ whisper-macos-cli transcribe --no-ffmpeg-fallback audio.ogg
 ```
 
 Quando esta flag é setada e um arquivo de vídeo é fornecido, a CLI
-retorna `Error::UnsupportedVideoFormat` (exit 65) em vez de tentar
+retorna `Error::UnsupportedVideoFormat` (saída 65) em vez de tentar
 a extração.
 
 ## Auto-Fallback OGG/Opus
 
 Os arquivos OGG/Opus produzidos pelo WhatsApp (e outros mensageiros
 de voz) acionam um bug conhecido no crate `symphonia`
-([Issue #8](https://github.com/pdeljanov/Symphonia/issues/8)) — o
-status "Opus" é oficialmente listado como **"In work"** pelo
-projeto. A partir da v0.1.2, o whisper-macos-cli detecta
-transparentemente essa falha e re-executa o decode via ffmpeg, que
-lida com o codec corretamente. O fallback é automático e produz
-saída idêntica a um decode nativo bem-sucedido.
+([Issue #8](https://github.com/pdeljanov/Symphonia/issues/8)). O
+status "Opus" é oficialmente listado como "In work" pelo projeto.
+A partir da v0.1.2, o whisper-macos-cli detecta transparentemente
+essa falha e re-executa o decode via ffmpeg, que lida com o codec
+corretamente. O fallback é automático e produz saída idêntica a um
+decode nativo bem-sucedido.
 
 Para verificar que o fallback está acontecendo, rode com `-v`:
 
@@ -125,32 +127,29 @@ tentando novamente.
 
 O subprocesso do ffmpeg é endurecido com as seguintes garantias:
 
-- **`env_clear()`** — nenhuma variável de ambiente do host é
-  herdada exceto uma allowlist mínima (`PATH`, `HOME`, `TMPDIR`,
-  `LANG`, `LC_ALL`). Secrets como `*_TOKEN` não podem vazar para
-  logs do ffmpeg.
-- **`setsid()` em Unix / `CREATE_NEW_PROCESS_GROUP` em Windows** —
-  o filho roda em seu próprio grupo de processos. Ctrl+C entregue
-  ao pai não propaga silenciosamente para o ffmpeg.
-- **Kill-on-drop** — o handle do filho é envolvido em um guard
-  `SafeChild`. Se o pai entrar em panic, o filho é morto (SIGKILL
-  em Unix, TerminateProcess em Windows) para prevenir processos
-  zumbi.
-- **Timeout limitado** — padrão 180s. No timeout, o filho é morto
-  e `Error::VideoExtractionFailed` é retornado.
-- **Validação de saída** — o WAV extraído é validado pós-processo:
-  deve ter header `RIFF...WAVE`, tamanho deve bater com o chunk
-  size do RIFF. Captura a classe de bug "ffmpeg exit 0 mas arquivo
-  vazio".
-- **Cleanup de temp** — o WAV temporário é removido via guard
-  `Drop` mesmo se o decode entrar em panic.
+- env_clear: nenhuma variável de ambiente do host é herdada exceto
+  uma allowlist mínima (`PATH`, `HOME`, `TMPDIR`, `LANG`, `LC_ALL`).
+  Secrets como `*_TOKEN` não podem vazar para logs do ffmpeg.
+- setsid em Unix / CREATE_NEW_PROCESS_GROUP em Windows: o filho
+  roda em seu próprio grupo de processos. Ctrl+C entregue ao pai
+  não propaga silenciosamente para o ffmpeg.
+- Kill-on-drop: o handle do filho é envolvido em um guard `SafeChild`.
+  Se o pai entrar em panic, o filho é morto (SIGKILL em Unix,
+  TerminateProcess em Windows) para prevenir processos zumbi.
+- Timeout limitado: padrão 180s. No timeout, o filho é morto e
+  `Error::VideoExtractionFailed` é retornado.
+- Validação de saída: o WAV extraído é validado pós-processo: deve
+  ter header `RIFF...WAVE`, tamanho deve bater com o chunk size
+  do RIFF. Captura a classe de bug "ffmpeg exit 0 mas arquivo vazio".
+- Cleanup de temp: o WAV temporário é removido via guard `Drop`
+  mesmo se o decode entrar em panic.
 
 ## Limites
 
-- **Duração máxima:** 24 horas (herdado do pipeline de áudio).
-- **Tamanho máximo de arquivo:** limitado pelo diretório temp;
-  ~3 GB é o teto prático para 1h de vídeo típico.
-- **Concorrência:** a flag `--concurrency N` governa quantas
+- Duração máxima: 24 horas (herdado do pipeline de áudio).
+- Tamanho máximo de arquivo: limitado pelo diretório temp; ~3 GB
+  é o teto prático para 1h de vídeo típico.
+- Concorrência: a flag `--concurrency N` governa quantas
   transcrições rodam em paralelo, cada uma podendo fazer spawn de
   um subprocesso ffmpeg. Em máquinas de 4 cores, `--concurrency 2`
   é seguro.
@@ -172,6 +171,6 @@ O subprocesso do ffmpeg é endurecido com as seguintes garantias:
 ## Veja Também
 
 - [TROUBLESHOOTING.pt-BR.md](TROUBLESHOOTING.pt-BR.md) — diagnóstico geral
-- [SKILL.pt-BR.md](../SKILL.pt-BR.md) — referência do contrato JSON
+- [skill/whisper-macos-cli-pt/SKILL.md](../skill/whisper-macos-cli-pt/SKILL.md) — referência do contrato JSON
 - [AGENTS.pt-BR.md](../AGENTS.pt-BR.md) — guia de integração com agentes
 - [CHANGELOG.pt-BR.md](../CHANGELOG.pt-BR.md) — notas de release

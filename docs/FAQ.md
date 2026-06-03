@@ -79,3 +79,54 @@ the bug report template.
 Through GitHub Security Advisories at
 https://github.com/daniloaguiarbr/whisper-macos-cli/security/advisories/new
 — NOT a public issue.
+
+## Can I transcribe video files?
+
+Yes, since v0.1.2. whisper-macos-cli supports MP4, MOV, M4V,
+MKV, WebM, AVI, FLV, and WMV/WMA containers. The audio track is
+extracted via ffmpeg subprocess before being fed to the regular
+whisper.cpp pipeline. See [VIDEO-EXTRACTION.md](VIDEO-EXTRACTION.md)
+for details.
+
+## Do I need ffmpeg?
+
+For audio-only files (MP3, WAV, FLAC, OGG/Vorbis, OGG/Opus,
+AAC), no. For video files, yes — install via `brew install ffmpeg`.
+For WhatsApp OGG/Opus voice messages, ffmpeg is optional: the
+CLI tries the native symphonia decoder first and only falls
+back to ffmpeg if the native decode fails (symphonia Issue #8
+upstream bug).
+
+## How do I install ffmpeg?
+
+- macOS: `brew install ffmpeg`
+- Ubuntu/Debian: `sudo apt-get install ffmpeg`
+- Windows (Chocolatey): `choco install ffmpeg`
+- Windows (winget): `winget install Gyan.FFmpeg`
+
+## What happens if ffmpeg is not installed?
+
+The CLI returns exit code 69 with a clear error message and a
+hint to install ffmpeg. For audio-only files, ffmpeg is not
+required unless the native OGG/Opus decoder fails.
+
+## Why does my OGG/Opus file fail with exit code 65?
+
+This was a known bug in v0.1.0 and v0.1.1 caused by symphonia's
+Opus codec being incomplete upstream (Issue #8, status "In work").
+As of v0.1.2, the CLI automatically falls back to ffmpeg when
+the native decode fails. If you still see this error, ensure
+ffmpeg is installed and not blocked by `--no-ffmpeg-fallback`.
+
+## Can I disable the ffmpeg fallback?
+
+Yes, pass `--no-ffmpeg-fallback` to the `transcribe` subcommand.
+This is useful for reproducing native decoder bugs. The flag is
+also available as the `WHISPER_NO_FFMPEG_FALLBACK` environment
+variable.
+
+## Can I use a custom ffmpeg path?
+
+Yes, pass `--ffmpeg-binary <PATH>` or set the
+`WHISPER_FFMPEG_BINARY` environment variable.
+

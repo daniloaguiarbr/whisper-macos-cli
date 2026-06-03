@@ -190,3 +190,52 @@ CI=true whisper-macos-cli transcribe --quiet --no-input \
 
 `CI=true` desabilita prompts interativos. `--no-input` é honrado
 automaticamente. `--quiet` suprime stderr.
+
+## Como Transcrever um Arquivo de Vídeo
+
+```bash
+whisper-macos-cli transcribe video.mp4
+```
+
+Requer ffmpeg 4.0+ no PATH. Veja
+[VIDEO-EXTRACTION.pt-BR.md](VIDEO-EXTRACTION.pt-BR.md) para a
+lista completa de containers suportados e garantias de
+segurança.
+
+## Como Transcrever em Lote uma Pasta de Vídeos
+
+```bash
+whisper-macos-cli transcribe --ndjson --concurrency 2 *.mp4
+```
+
+Concorrência é limitada em fluxos de vídeo porque cada
+transcrição faz spawn de um subprocesso ffmpeg. Em máquinas de
+4 cores, `--concurrency 2` é seguro.
+
+## Como Usar um Binário ffmpeg Customizado
+
+```bash
+whisper-macos-cli transcribe --ffmpeg-binary /opt/local/bin/ffmpeg video.mov
+```
+
+Use quando o ffmpeg está instalado via MacPorts, Homebrew ou
+prefixo customizado e não está no PATH padrão.
+
+## Como Reproduzir um Bug do Decoder Nativo
+
+```bash
+whisper-macos-cli transcribe --no-ffmpeg-fallback audio.ogg
+```
+
+Desabilita o fallback transparente para ffmpeg. Use ao debugar
+o comportamento do decoder nativo do symphonia.
+
+## Como Verificar que o Fallback do ffmpeg Está Acionando
+
+```bash
+whisper-macos-cli transcribe -v audio.ogg
+# stderr: ... native decode failed, attempting ffmpeg fallback
+```
+
+A flag `-v` aumenta a verbosidade para que a decisão de fallback
+seja logada no stderr.

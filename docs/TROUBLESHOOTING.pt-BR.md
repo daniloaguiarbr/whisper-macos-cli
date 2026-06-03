@@ -21,6 +21,18 @@ suportado.
 Correção: verifique se o arquivo toca em um player de mídia, depois
 re-exporte como WAV descompactado ou OGG/Opus padrão.
 
+Para arquivos de vídeo, o código 65 também cobre:
+
+- `Error::VideoExtractionFailed` — subprocesso ffmpeg falhou
+  (timeout, OOM, stream de vídeo inválido, etc.)
+- `Error::UnsupportedVideoFormat` — input é vídeo mas
+  `--no-ffmpeg-fallback` está ativo
+
+Correção: instale ffmpeg (`brew install ffmpeg`) e tente novamente
+sem `--no-ffmpeg-fallback`. Veja
+[VIDEO-EXTRACTION.pt-BR.md](VIDEO-EXTRACTION.pt-BR.md) para
+detalhes.
+
 ## código de saída 66 — arquivo de entrada não encontrado
 
 O caminho que você forneceu não existe ou não é legível.
@@ -30,14 +42,21 @@ está presente.
 
 ## código de saída 69 — serviço indisponível
 
-O download do modelo falhou ou você está em uma plataforma não
-suportada.
+O download do modelo falhou, você está em uma plataforma não
+suportada, ou o ffmpeg não está instalado e o input é um arquivo
+de vídeo (ou o decode nativo OGG/Opus falhou e o fallback
+precisa do ffmpeg).
 
 Correção:
 
 1. Rode `whisper-macos-cli doctor` para ver o que está errado
 2. Verifique sua conexão de rede
 3. Confirme que está em macOS com Apple Silicon
+4. Para arquivos de vídeo: instale ffmpeg via `brew install ffmpeg`
+5. Para fallback OGG/Opus: instale ffmpeg e remova
+   `--no-ffmpeg-fallback` se presente
+6. Use `--ffmpeg-binary <PATH>` se o ffmpeg está instalado mas
+   não no PATH
 
 ## código de saída 70 — inferência do whisper falhou
 

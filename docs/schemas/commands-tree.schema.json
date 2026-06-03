@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/daniloaguiarbr/whisper-macos-cli/schemas/commands-tree/v0.1.0.json",
+  "$id": "https://github.com/daniloaguiarbr/whisper-macos-cli/schemas/commands-tree/v0.1.2.json",
   "title": "CommandsTree",
   "description": "Full command tree emitted by whisper-macos-cli commands",
   "type": "object",

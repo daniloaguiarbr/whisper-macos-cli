@@ -189,3 +189,51 @@ CI=true whisper-macos-cli transcribe --quiet --no-input \
 
 `CI=true` disables interactive prompts. `--no-input` is honored
 automatically. `--quiet` suppresses stderr.
+
+## How To Transcribe a Video File
+
+```bash
+whisper-macos-cli transcribe video.mp4
+```
+
+Requires ffmpeg 4.0+ on PATH. See
+[VIDEO-EXTRACTION.md](VIDEO-EXTRACTION.md) for the full list of
+supported containers and security guarantees.
+
+## How To Batch Transcribe a Folder of Videos
+
+```bash
+whisper-macos-cli transcribe --ndjson --concurrency 2 *.mp4
+```
+
+Concurrency is limited on video workflows because each
+transcription spawns an ffmpeg subprocess. On 4-core machines,
+`--concurrency 2` is safe.
+
+## How To Use a Custom ffmpeg Binary
+
+```bash
+whisper-macos-cli transcribe --ffmpeg-binary /opt/local/bin/ffmpeg video.mov
+```
+
+Use this when ffmpeg is installed via MacPorts, Homebrew, or
+a custom prefix and not on the default PATH.
+
+## How To Reproduce a Native Decoder Bug
+
+```bash
+whisper-macos-cli transcribe --no-ffmpeg-fallback audio.ogg
+```
+
+Disables the transparent ffmpeg fallback. Use this when
+debugging the native symphonia decoder behavior.
+
+## How To Verify the ffmpeg Fallback is Happening
+
+```bash
+whisper-macos-cli transcribe -v audio.ogg
+# stderr: ... native decode failed, attempting ffmpeg fallback
+```
+
+The `-v` flag increases verbosity so the fallback decision is
+logged to stderr.

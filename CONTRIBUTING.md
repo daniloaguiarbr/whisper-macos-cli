@@ -69,6 +69,34 @@ Every public change must update:
 - The relevant section in `README.md`
 - The relevant section in `README.pt-BR.md`
 - Doc comments on changed public items
+- The relevant guide in `docs/` (e.g. `docs/VIDEO-EXTRACTION.md`
+  when changing video extraction behavior, `docs/COOKBOOK.md` for
+  new recipes, `docs/FAQ.md` for new questions)
+- The corresponding `*.pt-BR.md` mirror in the same edit
+- The matching `docs/schemas/*.schema.json` if the change affects
+  the JSON contract, and bump the `$id` version when adding fields
+- The skill descriptors in `skill/whisper-macos-cli-en/SKILL.md`
+  and `skill/whisper-macos-cli-pt/SKILL.md` when changing the JSON
+  contract, exit codes, or new CLI flags
+
+### Documentation Structure
+
+The documentation is organized as:
+
+- Root: 8 canonical documents (README, CHANGELOG, CONTRIBUTING,
+  CODE_OF_CONDUCT, SECURITY, INTEGRATIONS, PRIVACY, AGENTS) plus
+  LICENSE, NOTICE, llms.txt variants, THIRD-PARTY-LICENSES.md
+- `docs/`: pedagogical guides (HOW_TO_USE, COOKBOOK, FAQ,
+  TROUBLESHOOTING, CROSS_PLATFORM, MIGRATION, TESTING, INTEGRATIONS,
+  VIDEO-EXTRACTION) plus `docs/AGENTS.md` for agent integrators
+- `docs/schemas/`: machine-readable JSON Schema files plus
+  `README.md` index
+- `skill/<SKILL_NAME>-{en,pt}/SKILL.md`: agent skill descriptors
+  organized by language subdirectory
+
+The project follows bilingual mirroring: every public document has
+a corresponding `.pt-BR.md` mirror. Both languages must be updated
+in the same commit.
 
 ## Report Bugs
 

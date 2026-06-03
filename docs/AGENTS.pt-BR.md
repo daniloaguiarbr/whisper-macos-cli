@@ -55,9 +55,30 @@ ecossistema Rust que compõem o binário estão documentadas em
 
 - Entrada: caminho de arquivo ou stdin
 - Saída: envelope JSON no stdout
-- Efeitos colaterais: pode escrever no diretório de cache de modelo
+- Efeitos colaterais: pode escrever no diretório de cache de
+  modelo; pode invocar subprocesso ffmpeg para vídeo ou fallback
+  OGG/Opus
 - Idempotente: sim (mesma entrada, mesmo modelo, mesma saída)
 - Checkpointable: não
+- Formatos suportados (v0.1.2+): MP3, WAV, FLAC, AAC, OGG/Vorbis,
+  OGG/Opus, MP4, MOV, M4V, MKV, WebM, AVI, FLV, WMV/WMA
+
+### Read (transcribe vídeo, v0.1.2+)
+
+- Entrada: caminho de arquivo de vídeo (MP4, MOV, M4V, MKV, WebM,
+  AVI)
+- Saída: envelope JSON no stdout (mesmo do transcribe de áudio)
+- Efeitos colaterais: faz spawn de subprocesso ffmpeg; escreve
+  WAV temporário em `$TMPDIR`; escreve no diretório de cache
+  de modelo
+- Idempotente: sim
+- Requer: ffmpeg 4.0+ no PATH ou via `--ffmpeg-binary`
+- Novas variantes de erro: `VideoExtractionFailed` (saída 65),
+  `FfmpegNotFound` (saída 69), `UnsupportedVideoFormat` (saída 65)
+- Novas flags: `--ffmpeg-binary <PATH>`,
+  `--no-ffmpeg-fallback`
+- Novas env vars: `WHISPER_FFMPEG_BINARY`,
+  `WHISPER_NO_FFMPEG_FALLBACK`
 
 ### Discovery
 
@@ -128,9 +149,9 @@ contrato, exemplos e códigos de saída.
 | 0      | Sucesso                 | n/a        |
 | 2      | Erro de uso             | não        |
 | 64     | Nenhuma entrada         | não        |
-| 65     | Áudio inválido          | não        |
+| 65     | Áudio ou vídeo inválido, falha de extração de vídeo, formato de vídeo não suportado | não |
 | 66     | Arquivo não encontrado  | não        |
-| 69     | Serviço indisponível    | sim        |
+| 69     | Serviço indisponível (ffmpeg ausente ou download falhou) | sim |
 | 70     | Erro de inferência      | não        |
 | 74     | Erro de I/O             | não        |
 | 78     | Erro de configuração    | não        |

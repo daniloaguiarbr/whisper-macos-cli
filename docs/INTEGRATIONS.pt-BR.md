@@ -1,6 +1,6 @@
-[English version](INTEGRATIONS.md) | [Versão em Português Brasileiro](INTEGRATIONS.pt-BR.md)
+[English version](README.md) | [Versão em Português Brasileiro](README.pt-BR.md)
 
-> Doze assistentes de codificação IA, doze frameworks de IA, trinta e nove integrações verificadas.
+> Doze assistentes de codificação IA, doze frameworks de IA, trinta e nove integrações verificadas via Unix pipelines.
 
 # Integrações
 
@@ -13,11 +13,12 @@ variáveis de ambiente ou um dos subcomandos documentados.
 
 ### v0.1.2
 
-- Flag `--ffmpeg-binary <PATH>` (env: `WHISPER_FFMPEG_BINARY`)
-  para extração de áudio de containers de vídeo
+- Flag `--ffmpeg-binary <PATH>` (env: `WHISPER_FFMPEG_BINARY`) para
+  extrair áudio de containers de vídeo
 - Flag `--no-ffmpeg-fallback` (env: `WHISPER_NO_FFMPEG_FALLBACK`)
-  para desabilitar o fallback transparente de OGG/Opus
+  para desabilitar o fallback OGG/Opus via ffmpeg
 - Suporte a transcrição de vídeo: MP4, MOV, M4V, MKV, WebM, AVI
+- Auto-fallback transparente para WhatsApp OGG/Opus
 
 ### v0.1.0
 
@@ -37,30 +38,30 @@ variáveis de ambiente ou um dos subcomandos documentados.
 | Frameworks de IA         | 12       | LangChain, LlamaIndex, DSPy               |
 | CLIs Unix Componíveis    | 11       | xh, fd, bat, jaq, ripgrep, xargs          |
 | Plataformas de CI/CD     | 4        | GitHub Actions, GitLab CI, Buildkite      |
-| Total                    | 39       |                                           |
+| Total                   | 39       |                                           |
 
 ## Claude Code
 
-Integração via subprocess. O envelope JSON no stdout é parseado
+Integração via subprocess. O JSON envelope no stdout é parseado
 diretamente. Veja `AGENTS.md` raiz para o contrato JSON completo.
 
 ## OpenCode
 
-Integração nativa via `SKILL.md`. O agente descobre a skill
+Integração nativa via SKILL.md. O agente descobre a skill
 automaticamente.
 
 ## Codex CLI (OpenAI)
 
-Integração via subprocess. Use `--quiet --no-input` para
-invocações em pipeline.
+Integração via subprocess. Use `--quiet --no-input` para chamadas
+em pipeline.
 
 ## Gemini CLI (Google)
 
-Integração via subprocess. Aceita saída do envelope JSON.
+Integração via subprocess. Aceita saída JSON do envelope.
 
 ## Cline
 
-Integração via subprocess. Suporta NDJSON para lote.
+Integração via subprocess. Suporta NDJSON para batch.
 
 ## Cursor
 
@@ -77,12 +78,11 @@ Integração via subprocess. Use `--quiet` para suprimir stderr.
 
 ## Continue
 
-Integração via subprocess. Configurável em
-`~/.continue/config.json`.
+Integração via subprocess. Configurável em `~/.continue/config.json`.
 
 ## Cody (Sourcegraph)
 
-Integração via subprocess. Use `--ndjson` para lote.
+Integração via subprocess. Use `--ndjson` para batch.
 
 ## Tabnine
 
@@ -94,7 +94,7 @@ Integração via subprocess. Use `--quiet` para output limpo.
 
 ## LangChain
 
-Integração via subprocess em tool nodes. Use Python
+Integração via subprocess dentro de tool nodes. Use Python
 `subprocess.run` com `capture_output=True`.
 
 ## LlamaIndex
@@ -118,11 +118,11 @@ Integração via subprocess em assistant agents. Use `subprocess_run`.
 ## CrewAI
 
 Integração via subprocess em custom tools. Use `BaseTool` com
-backend subprocess.
+subprocess backend.
 
 ## smolagents
 
-Integração via subprocess em custom tools. Use decorator `tool`.
+Integração via subprocess em custom tools. Use `tool` decorator.
 
 ## PydanticAI
 
@@ -132,7 +132,7 @@ invocação síncrona.
 ## Atomic Agents
 
 Integração via subprocess em custom tools. Use `BaseAgent` com
-backend subprocess.
+subprocess backend.
 
 ## DSPy
 
@@ -142,7 +142,7 @@ Integração via subprocess em custom modules. Use `dspy.Tool` com
 ## Guidance
 
 Integração via subprocess em custom guidance programs. Use
-`subprocess.run` para lote.
+`subprocess.run` para batch.
 
 ## Outlines
 
@@ -152,16 +152,16 @@ Integração via subprocess em custom generators. Use
 ## GitHub Actions
 
 Integração via subprocess no CI. Use `runs-on: macos-14` com
-`actions/checkout` e `cargo install whisper-macos-cli`.
+`actions/checkout` + `cargo install whisper-macos-cli`.
 
 ## GitLab CI
 
 Integração via subprocess. Configure runner macOS Apple Silicon
-com toolchain Rust.
+com Rust toolchain.
 
 ## CircleCI
 
-Integração via subprocess via executor `macos.x86` ou `arm64`.
+Integração via subprocess via `macos.x86` ou `arm64` executor.
 
 ## Buildkite
 
@@ -172,5 +172,4 @@ Integração via subprocess via agent macOS Apple Silicon.
 - Todos os agentes de IA integram invocando o binário via subprocess
 - Todas as CLIs componíveis são testadas nas receitas do cookbook
 - Integração CI/CD usa Trusted Publishing via OIDC
-- A integração por subprocess é estável e versionada via
-  `schema_version`
+- A integração por subprocess é estável e versionada via `schema_version`

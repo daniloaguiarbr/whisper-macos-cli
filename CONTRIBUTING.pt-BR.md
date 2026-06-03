@@ -69,6 +69,35 @@ Toda mudança pública deve atualizar:
 - A seção relevante em `README.md`
 - A seção relevante em `README.pt-BR.md`
 - Doc comments em itens públicos alterados
+- O guia correspondente em `docs/` (ex.: `docs/VIDEO-EXTRACTION.md`
+  ao mudar comportamento de extração de vídeo, `docs/COOKBOOK.md`
+  para novas receitas, `docs/FAQ.md` para novas perguntas)
+- O espelho `*.pt-BR.md` correspondente na mesma edição
+- O arquivo `docs/schemas/*.schema.json` se a mudança afeta o
+  contrato JSON, e bumpar a versão do `$id` ao adicionar campos
+- Os descritores de skill em `skill/whisper-macos-cli-en/SKILL.md`
+  e `skill/whisper-macos-cli-pt/SKILL.md` ao mudar o contrato JSON,
+  códigos de saída ou novas flags da CLI
+
+### Estrutura da Documentação
+
+A documentação está organizada assim:
+
+- Raiz: 8 documentos canônicos (README, CHANGELOG, CONTRIBUTING,
+  CODE_OF_CONDUCT, SECURITY, INTEGRATIONS, PRIVACY, AGENTS) mais
+  LICENSE, NOTICE, variantes de llms.txt, THIRD-PARTY-LICENSES.md
+- `docs/`: guias pedagógicos (HOW_TO_USE, COOKBOOK, FAQ,
+  TROUBLESHOOTING, CROSS_PLATFORM, MIGRATION, TESTING, INTEGRATIONS,
+  VIDEO-EXTRACTION) mais `docs/AGENTS.md` para integradores de
+  agentes
+- `docs/schemas/`: arquivos JSON Schema legíveis por máquina mais
+  índice `README.md`
+- `skill/<SKILL_NAME>-{en,pt}/SKILL.md`: descritores de skill de
+  agente organizados por subpasta de idioma
+
+O projeto segue espelhamento bilíngue: cada documento público tem
+um espelho `.pt-BR.md` correspondente. Ambos os idiomas devem ser
+atualizados no mesmo commit.
 
 ## Reportar Bugs
 

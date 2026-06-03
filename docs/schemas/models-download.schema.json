@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/daniloaguiarbr/whisper-macos-cli/schemas/models-download/v0.1.0.json",
+  "$id": "https://github.com/daniloaguiarbr/whisper-macos-cli/schemas/models-download/v0.1.2.json",
   "title": "ModelsDownloadStatus",
   "type": "object",
   "required": ["schema_version", "correlation_id", "model", "action"],
